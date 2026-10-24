@@ -1,3 +1,638 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Calling Desk – Genesis Infoserve</title>
+<style>
+:root{--bg:#0d1514;--card:#131d1c;--line:#24332f;--tx:#e8f0ee;--mu:#8da39e;--teal:#5fd4c0;--green:#52d68a;--amber:#e8b04a;--red:#f0705f;--blue:#6aa5ff;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 "Segoe UI",system-ui,sans-serif;padding:16px;max-width:760px;margin-inline:auto}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+h1{margin:0;font-size:20px}
+.date{color:var(--mu);font-size:12px}
+.cnt{text-align:right;flex:1;max-width:260px}
+.cnt b{font-size:13px}.cnt small{color:var(--mu);float:right}
+.bar{height:6px;background:#1c2a28;border-radius:9px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal);width:0;transition:width .3s}
+nav{display:flex;gap:4px;margin:16px 0 12px;overflow-x:auto}
+nav button{background:none;border:0;border-radius:99px;padding:8px 16px;color:var(--mu);white-space:nowrap}
+nav button.on{background:var(--tx);color:#10201d;font-weight:600}
+nav .n{background:#233430;border-radius:99px;padding:1px 7px;font-size:11px;margin-left:4px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.chip{border:1px solid var(--line);background:#0f1a18;border-radius:99px;padding:6px 14px;font-weight:600;font-size:12px}
+.chip.on{background:var(--teal);color:#06231d;border-color:var(--teal)}
+select,input[type=text]{background:#0f1a18;border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+.me{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--mu);font-size:12px}
+.me input{width:130px}
+.lead{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.top{display:flex;justify-content:space-between;gap:8px}
+.lead h2{margin:0;font-size:15px;letter-spacing:.2px}
+.sub{color:var(--mu);font-size:12px;margin-top:3px}
+.tag{background:#14403a;color:var(--teal);border-radius:5px;padding:1px 7px;font-size:11px;font-weight:600;margin-left:4px}
+.st{background:#243230;border-radius:99px;padding:3px 10px;font-size:11px;height:fit-content;white-space:nowrap}
+.phone{display:flex;gap:8px;align-items:center;margin:12px 0;flex-wrap:wrap}
+.num{background:#0f3a35;border-radius:8px;padding:10px 14px;font:600 17px ui-monospace,Consolas,monospace;color:var(--tx);text-decoration:none;letter-spacing:1px}
+.sm{background:#0f1a18;border:1px solid var(--line);border-radius:7px;padding:7px 11px;font-size:12px;font-weight:600}
+.sm.wa{color:var(--green);border-color:var(--green)}
+.lbl{color:var(--mu);font-size:11px;font-weight:700;letter-spacing:.8px;margin:12px 0 6px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.o{background:transparent;border:1px solid;border-radius:9px;padding:12px 6px;font-weight:600;font-size:13px}
+.o.on{background:currentColor}.o.on span{color:#0d1514}
+.c-g{color:#a9b8b4;border-color:#3b4a46}.c-a{color:var(--amber);border-color:#7a5a1e;background:#2a2112}
+.c-r{color:var(--red);border-color:#7a2f27;background:#2b1513}.c-r2{color:var(--red);border-color:#8a3a30;background:#3a1a16}
+.n-g{color:var(--green);border-color:#2f8a5b;background:#10261d}.n-b{color:var(--blue);border-color:#2f4f8a;background:#121d33}
+.o.on{filter:brightness(1.0);outline:2px solid currentColor;outline-offset:1px}
+.o.on span{color:inherit}
+textarea{width:100%;min-height:62px;background:#0f1a18;border:1px solid var(--line);border-radius:9px;padding:10px;resize:vertical;margin-top:12px}
+.em{width:100%;margin-bottom:4px}
+.src{text-align:right;color:var(--mu);font-size:11px;margin-top:8px}.src a{color:var(--blue)}
+.empty,.box{color:var(--mu);text-align:center;padding:30px 12px;border:1px dashed var(--line);border-radius:12px}
+.box{text-align:left;color:var(--tx);background:var(--card);border-style:solid;margin-bottom:12px;padding:16px}
+.modal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:16px}
+.modal.show{display:flex}
+.modal div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;max-width:480px;max-height:85vh;overflow:auto}
+.modal p{margin:8px 0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stats div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.stats b{font-size:24px;display:block}
+.bk{margin-left:auto;background:var(--teal);color:#06231d!important;font-weight:700;border:0;border-radius:99px;padding:8px 16px;white-space:nowrap}
+@media(max-width:520px){.me{margin-left:0;width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Daily Calling Desk</h1><div class="date" id="date"></div><div class="date" id="tot" style="color:var(--teal);font-weight:600;margin-top:2px"></div></div>
+  <div class="cnt"><b><span id="done">0</span> calls aaj</b><small>target <span id="tgt">40</span></small><div class="bar"><i id="fill"></i></div></div>
+</header>
+<nav id="tabs"></nav>
+<div id="gs" style="padding:8px 14px 0"><input type="search" id="gq" placeholder="🔍 Sab leads mein search: naam, phone, area, email, note..." oninput="gSearch(this.value)" autocomplete="off" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line,#2a3a37);background:var(--card,#101a19);color:inherit;font-size:15px"><div id="gres"></div></div>
+<div id="view"></div>
+<div class="modal" id="modal"><div id="mbody"></div></div>
+
+<script>
+const LEADS=[
+{id:1,n:"SSA Architects",a:"Prabhadevi",t:"Architect",p:"+91 22 6629 6500",c:"Design software"},
+{id:2,n:"Sanjay Puri Architects",a:"Worli",t:"Architect",p:"+91 22 2496 5840",c:"Design software"},
+{id:3,n:"Collaborative Architecture",a:"Parel",t:"Architect",p:"+91 99670 33533",c:"Design software"},
+{id:4,n:"IMK Architects",a:"Worli",t:"Architect",p:"+91 22 4050 6666",c:"Design software"},
+{id:5,n:"Aum Architects",a:"Chembur",t:"Architect",p:"+91 22 4976 1288",c:"Design software"},
+{id:6,n:"A.L.F.T Architecture & Interior",a:"Tardeo",t:"Architect",p:"+91 22 2352 3257",c:"Design software"},
+{id:7,n:"SJK Architects",a:"Colaba",t:"Architect",p:"+91 22 3542 6887",c:"Design software",x:"Receptionist call transfer nahi karti, seedha partner/IT head maango."},
+{id:8,n:"Milind Pai",a:"Andheri West",t:"Architect",p:"+91 80823 20002",c:"Design software"},
+{id:9,n:"Aaryan Structcon Pvt Ltd",a:"Andheri East",t:"Structural consultant",p:"+91 99302 64726",c:"Design software"},
+{id:10,n:"Capstone Consultants",a:"Saki Naka",t:"Structural consultant",p:"+91 77108 92279",c:"Design software"},
+{id:11,n:"Mahimtura Consultants",a:"Fort",t:"Structural consultant",p:"+91 22 4368 5000",c:"Design software"},
+{id:12,n:"Shashank Mehendale Consultants",a:"Mahim",t:"Structural consultant",p:"+91 22 2447 3963",c:"Design software"},
+{id:13,n:"Mohit S. Shah & Co.",a:"Marine Lines",t:"CA firm",p:"+91 98214 62283",c:"Security"},
+{id:14,n:"Vijay R Singh & Co.",a:"Andheri East",t:"CA firm",p:"+91 98607 23959",c:"Security"},
+{id:15,n:"R J Gala & Associates",a:"Charni Road",t:"CA firm",p:"+91 90225 73304",c:"Security"},
+{id:16,n:"N D Savla & Associates",a:"Andheri East",t:"CA / law firm",p:"+91 98218 32683",c:"Security",x:"Ye number Girgaon branch ka bhi hai. Dono branches ka IT ek hi ho sakta hai."},
+{id:17,n:"Vivek Shah & Co",a:"Lower Parel",t:"CA firm",p:"+91 98208 06999",c:"Security"},
+{id:18,n:"JuristechLegal & Partners",a:"Kala Ghoda",t:"Law firm",p:"+91 83695 94241",c:"Security",x:"Ye firm DPDP Act / data protection pe advisory deti hai. Data security ka angle seedha kaam karega."},
+{id:19,n:"Crawford Bayley & Co.",a:"Kala Ghoda",t:"Law firm",p:"+91 22 2266 8000",c:"Security"},
+{id:20,n:"Wadia Ghandy & Co.",a:"Kala Ghoda",t:"Law firm",p:"+91 22 4073 5600",c:"Security"},
+{id:21,n:"JSA Advocates & Solicitors",a:"Ballard Estate",t:"Law firm",p:"+91 22 4341 8600",c:"Security"},
+{id:22,n:"Omkara Capital Pvt Ltd",a:"Parel",t:"Financial services",p:"+91 78978 91192",c:"Security"},
+{id:23,n:"Varsha Financial Services",a:"Charni Road",t:"Financial services",p:"+91 98209 66000",c:"Security"},
+{id:24,n:"MMW Financial Services LLP",a:"Ghatkopar West",t:"Financial services",p:"+91 98206 14955",c:"Security"}];
+const SEC=l=>l.c==="Security";
+const MORE=`The Architect's Studio|Shahdara|Delhi|+91 96433 97561|D
+Amartya Architects|Rohini|Delhi|+91 89292 91931|D
+Studio Lotus|Lado Sarai|Delhi|+91 98180 46532|D
+Spaces Architects @ka|South Extension|Delhi|+91 93110 13122|D
+42mm Architecture|Saket|Delhi|+91 11 4011 4364|D
+JHA Design Architect|Rohini|Delhi|+91 98995 97489|D
+Design Forum International|Greater Kailash|Delhi|+91 11 4655 6600|D
+DB Architects|Hoodi|Bengaluru|+91 96060 92220|D
+Kamat & Rozario Architecture|Fraser Town|Bengaluru|+91 80 4851 4366|D
+Cadence Architects|Shankarapura|Bengaluru|+91 96866 50274|D
+RC Architecture|Richmond Town|Bengaluru|+91 80 4937 8800|D
+Architecture Paradigm|Koramangala|Bengaluru|+91 80 2552 5585|D
+Mindspace Architects|Sanjayanagar|Bengaluru|+91 80 2351 5501|D
+RSP Design Consultants|Ashok Nagar|Bengaluru|+91 80 4196 6868|D
+N S Associates|Banjara Hills|Hyderabad|+91 98490 23778|D
+Shaik Architects|Kukatpally|Hyderabad|+91 86863 01217|D
+Genesis Planners|Jubilee Hills|Hyderabad|+91 40 6697 7777|D
+MDeepa Architects|Manikonda|Hyderabad|+91 83098 38138|D
+Finger6 Architects|Banjara Hills|Hyderabad|+91 40 4856 5966|D
+Spacefiction Studio|Jubilee Hills|Hyderabad|+91 95021 27722|D
+NA Architects|Madhapur|Hyderabad|+91 62059 36410|D
+World of Architecture|Bavdhan|Pune|+91 79 4929 3594|D
+TAO Architecture|Mundhwa|Pune|+91 74477 19344|D
+Infinity by Sanam & Ajinkya Dhumal|Sangamvadi|Pune|+91 20 2616 1110|D
+Aakriti Architects|Wakad|Pune|+91 95036 14486|D
+VK:a architecture|Chattushringi|Pune|+91 20 6626 8888|D
+CCBA Designs|Balewadi|Pune|+91 84460 04477|D
+Cubix Architects Associates|Bibwewadi|Pune|+91 98818 61273|D
+Ansari Architects|T. Nagar|Chennai|+91 82489 14643|D
+Studio DIOX|Nungambakkam|Chennai|+91 96001 23108|D
+C R Narayana Rao Architects|Mylapore|Chennai|+91 44 2499 1676|D
+Dwellion Architecture|Anna Nagar|Chennai|+91 44 4202 8181|D
+Unique Angle Architecture|Anna Nagar|Chennai|+91 70920 36628|D
+KSM Architecture|St. Thomas Mount|Chennai|+91 44 2233 3587|D
+DEEJOS Architects|Chromepet|Chennai|+91 81100 00384|D
+Atul Mangal & Co|Munirka|Delhi|+91 92120 07566|S
+Manish Anil Gupta And Co|Janakpuri|Delhi|+91 99994 55360|S
+Agarwal Taxcon Pvt Ltd|Krishna Nagar|Delhi|+91 75036 38500|S
+ADY & Co|Jahangirpuri|Delhi|+91 99998 13738|S
+CA Naresh Kansal|Pitampura|Delhi|+91 98731 92124|S
+Malik Girish Anand & Co|Vikaspuri|Delhi|+91 98100 46556|S
+KDMG & Associates|Rohini|Delhi|+91 99967 24716|S
+N Murali Krishna & Co|Malleshwaram|Bengaluru|+91 89518 96151|S
+B C Shetty & Co|Kundalahalli|Bengaluru|+91 87927 40344|S
+Chopda & Kataria|Fraser Town|Bengaluru|+91 94824 67333|S
+Mukunda Shiva & Associates|Jayanagar|Bengaluru|+91 80 4163 3750|S
+Vagrecha & Associates|Whitefield|Bengaluru|+91 99869 50096|S
+CA Ajaya Kumara MN|Basavanagudi|Bengaluru|+91 91646 40164|S
+Yashveer Singh Sisodia & Co|Jeevan Bima Nagar|Bengaluru|+91 89040 81917|S
+VNR Associates|Ameerpet|Hyderabad|+91 93921 44289|S
+Owaisuddin & Associates|Mehdipatnam|Hyderabad|+91 86393 48078|S
+Anil Reddy & Co|Kukatpally|Hyderabad|+91 63574 45566|S
+Palod and Loya|Himayatnagar|Hyderabad|+91 81253 06067|S
+KS Pratap & Co|Banjara Hills|Hyderabad|+91 90007 86310|S
+CLAN & Associates|Madhapur|Hyderabad|+91 97423 84394|S
+Eswaraiah and Associates|Ameerpet|Hyderabad|+91 77940 14329|S
+MJS & Co LLP|Baner|Pune|+91 97661 59047|S
+A N Bhutada & Co|Sangamvadi|Pune|+91 80555 66789|S
+CA Nikhita K G & Associates|Baner|Pune|+91 98216 67482|S
+CA Dhiraj Ostwal|Shivajinagar|Pune|+91 70200 45454|S
+CAK & Associates LLP|Viman Nagar|Pune|+91 77570 24647|S
+Mittal & Co|Bavdhan|Pune|+91 93714 62295|S
+Shingate and Associates LLP|Parvati|Pune|+91 91324 92492|S
+S. Madhavan & Associates|Vadapalani|Chennai|+91 98656 91436|S
+RN Associates|Porur|Chennai|+91 99625 78696|S
+Taxla Services|Saligramam|Chennai|+91 99410 10555|S
+K. Balamurugan CA|Anna Nagar|Chennai|+91 96001 89144|S
+Smaya and Associates|Anna Nagar|Chennai|+91 97100 07514|S
+V Ramaratnam & Company|Ashok Nagar|Chennai|+91 98402 77503|S
+GGSH & Co LLP|West Mambalam|Chennai|+91 93849 02468|S`;
+MORE.split("\n").forEach((r,i)=>{const[n,a,city,p,k]=r.split("|");LEADS.push({id:25+i,n,a,city,t:k==="D"?"Architect":"CA firm",p,c:k==="D"?"Design software":"Security"})});
+const MORE2=`DK Architecture Design|Sola|Ahmedabad|+91 73837 01582|D
+The Grid Architects|Chanakyapuri|Ahmedabad|+91 79 4002 7009|D
+99 Studio|Satellite|Ahmedabad|+91 79 4002 8361|D
+Noorani Architects|Makarba|Ahmedabad|+91 70438 04639|D
+Hiren Patel Architects (HPAD)|Telav|Ahmedabad|+91 79 2675 2621|D
+Archana Amit Shah|Ambawadi|Ahmedabad|+91 98250 24320|D
+Associated Architects (AAPL)|Bodakdev|Ahmedabad|+91 79 2687 2202|D
+Vidhya Architects|Malviya Nagar|Jaipur|+91 95303 23030|D
+Times Architecture Firm|Mansarovar|Jaipur|+91 93529 00565|D
+ASD Studio|Vaishali Nagar|Jaipur|+91 88669 45111|D
+Sincere Architects Engineers|Jai Ambey Nagar|Jaipur|+91 141 272 1695|D
+JKS Architects|Vaishali Nagar|Jaipur|+91 89556 21119|D
+Architecture Floor|Pratap Nagar|Jaipur|+91 94605 77890|D
+Maniramka & Associates|Taltala|Kolkata|+91 33 2217 8329|D
+Abin Design Studio|Gariahat|Kolkata|+91 33 2466 6191|D
+BuildCraft Structure Design|Esplanade|Kolkata|+91 74390 76081|D
+ArcOn Design|Salt Lake|Kolkata|+91 98043 44424|D
+Agarwal & Agarwal Architects|Ballygunge|Kolkata|+91 98303 76375|D
+Anjan Gupta Architects|Dhakuria|Kolkata|+91 33 4007 6000|D
+Espace|Kalighat|Kolkata|+91 33 2465 4159|D
+Deep Breath Architecture|Piplod|Surat|+91 90231 63705|D
+Vaaste Architects|Vesu|Surat|+91 97234 61992|D
+Next Step Architects|Patel Nagar|Surat|+91 98989 34066|D
+A J Architects|Vesu|Surat|+91 261 796 7021|D
+EssTeam Design Services|Piplod|Surat|+91 99090 16610|D
+Mahim Architect|Athwa|Surat|+91 70461 27242|D
+Genesis Architects|Athwa|Surat|+91 98250 23310|D
+Shivalok Architects|Gomti Nagar|Lucknow|+91 94151 21638|D
+CivilArch Group|Gomti Nagar|Lucknow|+91 98899 28289|D
+Pioneer Architects|Indira Nagar|Lucknow|+91 85741 33737|D
+Archway Studio Architects|Gomti Nagar|Lucknow|+91 82186 15253|D
+A+ Design Architects|Gomti Nagar|Lucknow|+91 95989 22294|D
+Hasan and Kushal Architects|Gomti Nagar|Lucknow|+91 98897 31413|D
+Vastulinear Consultant|Gomti Nagar|Lucknow|+91 93694 29618|D
+K M Gatecha & Co LLP|Prahlad Nagar|Ahmedabad|+91 80000 57972|S
+CA Murli Chandak|Navrangpura|Ahmedabad|+91 99980 59923|S
+Pujara & Co|Satellite|Ahmedabad|+91 90168 75077|S
+Mevada & Co|Navrangpura|Ahmedabad|+91 70424 65554|S
+Nimit B Shah & Co|Navrangpura|Ahmedabad|+91 98253 51008|S
+Anuj B Shah & Co|Naranpura|Ahmedabad|+91 88491 35781|S
+CA B K Goyal & Co LLP|Ashok Nagar|Jaipur|+91 99717 82649|S
+CA Goyal Mangal & Co|Gopalpura|Jaipur|+91 97853 12345|S
+Jain Paras Bilala & Co|Lalkothi|Jaipur|+91 141 274 1888|S
+AVPM & Associates|Lalkothi|Jaipur|+91 93522 96200|S
+Ritul Patwa & Co|Lalkothi|Jaipur|+91 90012 31231|S
+N Khatri & Associates|C Scheme|Jaipur|+91 98871 06581|S
+CA C S K G & Co|Brijlalpura|Jaipur|+91 98365 18066|S
+V K Patawari & Co|Barabazar|Kolkata|+91 33 2242 2939|S
+R. Harlalka & Co|BBD Bagh|Kolkata|+91 33 2231 6242|S
+Marc Quantira Consulting|Taltala|Kolkata|+91 94333 62018|S
+Sanjay Om Prakash Gupta & Co|Netaji Nagar|Kolkata|+91 98306 60012|S
+Ramesh C Gupta & Co|Bowbazar|Kolkata|+91 81008 31099|S
+B.K. Khemka & Co|Tiretti|Kolkata|+91 97484 28538|S
+Agarwal & Jain CAs|Vesu|Surat|+91 96875 59363|S
+Nakrani Rabadiya & Co|Nana Varachha|Surat|+91 87339 59198|S
+Zawar & Co|City Light|Surat|+91 99794 31188|S
+CA Hardik Sonar|Udhana|Surat|+91 95374 58057|S
+Maars & Associates|Maan Darwaja|Surat|+91 84607 77760|S
+VCAS & Co LLP|Patel Nagar|Surat|+91 96248 67495|S
+NCMC & Associates|Mota Varachha|Surat|+91 95865 18264|S
+CA Arpit Gupta & Co|Indira Nagar|Lucknow|+91 70812 20600|S
+T. Nagar and Co|Chandralok|Lucknow|+91 98390 21599|S
+Abhay & Associates|Gomti Nagar|Lucknow|+91 94154 09114|S
+Dube Pandey and Company|Indira Nagar|Lucknow|+91 94151 40601|S
+Chandnani & Associates|Alambagh|Lucknow|+91 63932 16050|S
+CA Amit Chawla & Co|Alambagh|Lucknow|+91 90447 42447|S
+HSAV and Associates|Gomti Nagar|Lucknow|+91 94515 05015|S`;
+MORE2.split("\n").forEach(r=>{const[n,a,city,p,k]=r.split("|");LEADS.push({id:LEADS.length+1,n,a,city,t:k==="D"?"Architect":"CA firm",p,c:k==="D"?"Design software":"Security"})});
+
+const HW=`Thadomal Shahani Engineering College|Bandra West|+91 99871 11590|H|College
+MH Saboo Siddik College of Engineering|Byculla|+91 22 2301 2922|H|College
+Sardar Patel College of Engineering|Andheri West|+91 70453 49534|H|College
+Atharva College of Engineering|Malad West|+91 22 4029 4949|H|College
+Datta Meghe College of Engineering|Airoli|+91 22 2769 2854|H|College
+Don Bosco Institute of Technology|Kurla|+91 22 2504 2424|H|College
+Dwarkadas J. Sanghvi College of Engineering|Vile Parle West|+91 22 4233 5000|H|College
+IIT Bombay|Powai|+91 22 2572 2545|N|University campus
+Institute of Chemical Technology (ICT)|Matunga|+91 22 3361 1111|N|University campus
+Amity University Mumbai|Bhatan, Panvel|+91 70457 80126|N|University campus
+Atlas SkillTech University|Kurla|+91 80975 20624|N|University campus`;
+HW.split("\n").forEach((r,i)=>{const[n,a,p,k,t]=r.split("|");LEADS.push({id:1000+i,n,a,city:"Mumbai",t,p,c:k==="H"?"IT Hardware":"Networking & CCTV"})});
+
+const HW2=`Edubridge International School|Grant Road East|+91 96191 28181|N|School|CCTV & Surveillance;Projectors & Displays;Laptops
+Oberoi International School|Goregaon East|+91 22 4236 3131|N|School|CCTV & Surveillance;Networking;Laptops
+NES International School|Malabar Hill|+91 22 2591 1478|H|School|Laptops;Projectors & Displays;Printers & Plotters
+MRV (MET Rishikul Vidyalaya)|Bandra West|+91 91369 01536|H|School|Desktops & Workstations;Projectors & Displays
+International School of Design (INSD)|Mulund West|+91 22 2564 9069|D|Design school|Autodesk;Adobe;Desktops & Workstations
+INSD Luxe|Andheri East|+91 70451 57008|D|Design school|Adobe;Autodesk;Laptops
+Kokilaben Dhirubhai Ambani Hospital|Andheri West|+91 22 4269 6969|N|Hospital|Servers;Networking;CCTV & Surveillance;UPS & Power
+Gleneagles Hospital|Parel|+91 92402 61964|N|Hospital|Servers;CCTV & Surveillance;UPS & Power
+Fortis Hospital Mulund|Mulund West|+91 22 4925 4925|H|Hospital|Servers;Storage & Backup;Antivirus / Endpoint
+Apollo Hospitals Navi Mumbai|Nerul|+91 22 3350 3350|N|Hospital|Networking;CCTV & Surveillance;Servers
+Avishkar Classes|Dadar West|+91 22 2436 1537|H|Coaching institute|Projectors & Displays;Laptops;Printers & Plotters
+Career Impact Institute|Andheri West|+91 22 2674 4476|H|Coaching institute|Desktops & Workstations;Projectors & Displays
+Prayas India|Andheri West|+91 77100 13217|H|Coaching institute|Projectors & Displays;Networking;Laptops
+Mind Game Coaching Classes|Andheri West|+91 83698 81682|H|Coaching institute|Projectors & Displays;Laptops
+Tribhovandas Bhimji Zaveri Ltd (TBZ)|Zaveri Bazaar|+91 22 3956 5001|N|Jewellery retail|CCTV & Surveillance;Servers;Networking;Antivirus / Endpoint`;
+HW2.split("\n").forEach((r,i)=>{const[n,a,p,k,t,pr]=r.split("|");LEADS.push({id:1100+i,n,a,city:"Mumbai",t,p,c:k==="H"?"IT Hardware":k==="N"?"Networking & CCTV":"Design software",dp:pr.split(";")})});
+
+const HW3=`Livspace Studio|Andheri West|+91 80477 59153|D|Interior design|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations
+Livspace Studio|Lower Parel|+91 80477 59128|D|Interior design|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations
+D'LIFE Home Interiors|Andheri East|+91 90722 45555|D|Interior design|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations
+The Orange Lane|Andheri West|+91 22 2637 0512|D|Interior design|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations
+AESTHOS Interior Design & Consultancy|Andheri East|+91 98204 04496|D|Interior design|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations
+United Interiors|J.B. Nagar, Andheri East|+91 22 2834 6621|D|Interior design|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations
+Parmar Associates|Andheri East|+91 98195 82785|D|Architect / interior|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations
+The Architect's Office (TAO)|Versova, Andheri West|+91 22 2639 4841|D|Architect / interior|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations
+Designs India|Mumbai|+91 97733 12111|D|Interior design|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations
+Shree Sai Interiors|Andheri East|+91 98922 95612|D|Interior contractor|Autodesk;Adobe;Laptops
+MEP Consulting Engineers|Santacruz West|+91 22 2612 5726|D|MEP consultant|Autodesk;Trimble;Desktops & Workstations;Printers & Plotters
+Total MEP Design & Consulting Engineers|Mumbai|+91 98199 61237|D|MEP consultant|Autodesk;Trimble;Desktops & Workstations;Printers & Plotters
+ECO MEP Consultants (BIM)|Goregaon West|+91 22 4826 3430|D|MEP / BIM consultant|Autodesk;Trimble;Desktops & Workstations;Printers & Plotters
+Prashanti MEP Consultancy|Lower Parel|+91 98190 26352|D|MEP consultant|Autodesk;Trimble;Desktops & Workstations;Printers & Plotters
+ShreeRaj Consultants & Contractors|Sanpada|+91 99305 60912|D|MEP / interior contractor|Autodesk;Trimble;Desktops & Workstations;Printers & Plotters|Navi Mumbai
+Datamatics|Marol MIDC, Andheri East|+91 22 6102 0000|H|IT company|Laptops;Networking;UPS & Power;Microsoft`;
+HW3.split("\n").forEach((r,i)=>{const[n,a,p,k,t,pr,city]=r.split("|");LEADS.push({id:1200+i,n,a,city:city||"Mumbai",t,p,c:k==="H"?"IT Hardware":k==="N"?"Networking & CCTV":"Design software",dp:pr.split(";")})});
+
+const HW4=`Agnel Polytechnic|Vashi|+91 22 4161 1000|H|Polytechnic|Desktops & Workstations;Laptops;Networking;Projectors & Displays|Navi Mumbai
+Government Polytechnic Mumbai|Bandra East|+91 22 2647 4780|H|Polytechnic|Desktops & Workstations;Laptops;Networking;Projectors & Displays
+Somaiya Polytechnic|Vidyavihar|+91 22 2102 7408|H|Polytechnic|Desktops & Workstations;Laptops;Networking;Projectors & Displays
+Premlila Vithaldas Polytechnic|Santacruz West|+91 22 2660 8676|H|Polytechnic|Desktops & Workstations;Laptops;Networking;Projectors & Displays
+Shri Bhagubhai Mafatlal Polytechnic|Vile Parle West|+91 22 4233 6000|H|Polytechnic|Desktops & Workstations;Laptops;Networking;Projectors & Displays
+MH Saboo Siddik Polytechnic|Byculla|+91 22 2300 6952|H|Polytechnic|Desktops & Workstations;Laptops;Networking;Projectors & Displays
+Vidyalankar Polytechnic|Wadala East|+91 22 2410 2321|H|Polytechnic|Desktops & Workstations;Laptops;Networking;Projectors & Displays
+IBS Mumbai|Powai|+91 22 4043 4343|N|MBA college|Networking;CCTV & Surveillance;Laptops;Projectors & Displays
+K J Somaiya Institute of Management|Vidyavihar|+91 22 6728 3000|N|MBA college|Networking;CCTV & Surveillance;Laptops;Servers
+Thakur Institute of Management Studies|Kandivali East|+91 22 6730 8201|H|MBA college|Desktops & Workstations;Laptops;Networking;Projectors & Displays
+Rizvi Institute of Management Studies|Bandra West|+91 70486 44883|H|MBA college|Laptops;Desktops & Workstations;Projectors & Displays
+Abhinav Institute of Technology & Management|Dadar|+91 22 2432 9775|H|MBA / coaching|Laptops;Desktops & Workstations;Projectors & Displays`;
+HW4.split("\n").forEach((r,i)=>{const[n,a,p,k,t,pr,city]=r.split("|");LEADS.push({id:1300+i,n,a,city:city||"Mumbai",t,p,c:k==="H"?"IT Hardware":"Networking & CCTV",dp:pr.split(";")})});
+
+const HW5=`ITC Maratha|Sahar, Andheri East|+91 22 2830 3030|N|Hotel|CCTV & Surveillance;Networking;UPS & Power;Laptops
+Hotel Sahara Star|Vile Parle East|+91 22 3989 5000|N|Hotel|CCTV & Surveillance;Networking;UPS & Power;Laptops
+Trident Nariman Point|Nariman Point|+91 22 6632 4343|N|Hotel|CCTV & Surveillance;Networking;UPS & Power;Laptops
+Trident Bandra Kurla|BKC, Bandra East|+91 22 6672 7777|N|Hotel|CCTV & Surveillance;Networking;UPS & Power;Laptops
+Taj Mahal Palace & Tower|Colaba|+91 22 6665 3366|N|Hotel|CCTV & Surveillance;Networking;UPS & Power;Laptops
+Le Royal Meridien|Sahar, Andheri East|+91 22 2838 0000|N|Hotel|CCTV & Surveillance;Networking;UPS & Power;Laptops
+Orchids The International School|Versova, Andheri West|+91 99994 31999|H|School|Laptops;Projectors & Displays;CCTV & Surveillance
+C P Goenka International School|Oshiwara, Andheri West|+91 72777 15555|H|School|Laptops;Projectors & Displays;CCTV & Surveillance`;
+HW5.split("\n").forEach((r,i)=>{const[n,a,p,k,t,pr]=r.split("|");LEADS.push({id:1400+i,n,a,city:"Mumbai",t,p,c:k==="H"?"IT Hardware":"Networking & CCTV",dp:pr.split(";")})});
+
+const HW6=`Architect Hafeez Contractor|Fort|+91 22 2266 1920|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+Morphogenesis|Andheri East|+91 22 6959 8000|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+RMA Architects|Kala Ghoda, Fort|+91 22 2283 4303|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+Sameep Padora & Associates (sP+a)|Bandra West|+91 22 4944 8217|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+SPASM Design Architects|Andheri West|+91 89281 26120|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+ZZ Architects|Lower Parel|+91 22 4360 6666|D|Architect / interior|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+KNS Architects|Andheri West|+91 22 6776 5000|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+Abraham John Architects|Khar West|+91 98207 00425|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+Malik Architecture|Ballard Estate|+91 22 6952 3333|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+Studio Mumbai|Byculla West|+91 22 2300 0754|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+Daisaria Architects|Vidyavihar West|+91 22 6111 0504|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+Edifice Consultants|Govandi East|+91 22 6703 1122|D|Architect / design consultant|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+Architecture BRIO|Worli|+91 22 2600 0192|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+Designers Group|Mahim West|+91 22 2444 2300|D|Architect / interior|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+Aum Architects|Govandi East|+91 22 4976 1288|D|Architect / interior|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|dmc-education.com Mumbai architects list
+Dot Architects|Bandra East|+91 22 2659 1042|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|worldorgs.com Mumbai architects
+Team One Architects (TOA)|Bandra Kurla Complex|+91 22 6622 3344|D|Architect / interior|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|worldorgs.com Mumbai architects
+Studio C|Bhaudaji Road, Matunga|+91 22 2401 8228|D|Architect|Autodesk;Adobe;Chaos (V-Ray);Lumion;Desktops & Workstations;Graphics Cards (GPU)|Mumbai|datanyze.com listing
+Bharati Vidyapeeth College of Engineering|Kharghar|+91 22 2757 2140|H|College|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Navi Mumbai|College website (bharatividyapeeth.edu)|+91 22 2757 1074
+A. P. Shah Institute of Technology (APSIT)|Ghodbunder Road, Thane West|+91 77383 05400|H|College|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Thane|College website (apsit.edu.in)|+91 22 2597 3737;+91 77389 40600
+Pillai College of Engineering|New Panvel|+91 22 6574 8000|H|College|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Navi Mumbai|pce.ac.in / mes.ac.in (official site)|+91 22 6574 8009;+91 22 6574 8010
+Dr. D.Y. Patil College of Architecture|Nerul|+91 22 2770 9454|H|College|Desktops & Workstations;Autodesk;Graphics Cards (GPU);Laptops|Navi Mumbai|targetstudy.com AICTE list
+Aditya Institute of Management Studies and Research|Borivali West|+91 80801 12200|H|MBA college|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list (WhatsApp no.)
+Rajpal Hospital|Koparkhairane|+91 22 2754 9911|N|Hospital|CCTV & Surveillance;Networking;Servers;UPS & Power|Navi Mumbai|policyx.com insurer hospital list
+Joy Hospital|Chembur|+91 22 2528 6911|N|Hospital|CCTV & Surveillance;Networking;Servers;UPS & Power|Mumbai|policyx.com insurer hospital list
+Sushrut Hospital & Research Centre|Chembur East|+91 22 2526 5500|N|Hospital|CCTV & Surveillance;Networking;Servers;UPS & Power|Mumbai|policyx.com insurer hospital list
+Criticare Hospital & Polyclinic|Juhu|+91 22 2628 3600|N|Hospital|CCTV & Surveillance;Networking;Servers;UPS & Power|Mumbai|policyx.com insurer hospital list
+Gurunanak Hospital|Bandra East|+91 22 4222 7777|N|Hospital|CCTV & Surveillance;Networking;Servers;UPS & Power|Mumbai|policyx.com insurer hospital list
+Apollo Spectra Hospital|Tardeo|+91 22 4332 4500|N|Hospital|CCTV & Surveillance;Networking;Servers;UPS & Power|Mumbai|policyx.com insurer hospital list
+Jasmine Hospital|Airoli|+91 22 2769 0053|N|Hospital|CCTV & Surveillance;Networking;Servers;UPS & Power|Navi Mumbai|policyx.com insurer hospital list
+Ashirwad Maternity & Nursing Home|Mulund Colony|+91 22 2590 8476|N|Hospital|CCTV & Surveillance;Networking;Servers;UPS & Power|Mumbai|policyx.com insurer hospital list`;
+function okNum(n){const r=String(n);if(/ext|extn|extension|\bx\s?\d{1,5}\b|#/i.test(r))return false;let d=r.replace(/\D/g,"");if(d.length===12&&d.startsWith("91"))d=d.slice(2);else if(d.length===11&&d[0]==="0")d=d.slice(1);return d.length===10}
+const d10=v=>String(v).replace(/\D/g,"").slice(-10);
+HW6.split("\n").forEach((r,i)=>{const[n,a,p,k,t,pr,city,src,p2]=r.split("|");if(!okNum(p))return;if(LEADS.some(x=>d10(x.p)===d10(p)))return;LEADS.push({id:1500+i,n,a,city:city||"Mumbai",t,p,c:k==="H"?"IT Hardware":k==="N"?"Networking & CCTV":"Design software",dp:pr.split(";"),src,p2:p2?p2.split(";").filter(okNum):[]})});
+
+const HW7=`Anjuman-I-Islam M.H. Saboo Siddik College of Engineering|Byculla|+91 22 2301 2922|H|College|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list|
+Annasaheb Chudaman Patil College of Engineering (ACPCE)|Kharghar|+91 97691 11241|H|College|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Navi Mumbai|targetstudy.com AICTE list|+91 22 2774 5722;+91 22 2774 5732
+AICMS Business School|Bandra West|+91 98202 72051|H|B-school|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list|+91 22 2438 6403
+Alkesh Dinesh Mody Institute for Financial and Management Studies|Santacruz East|+91 22 2653 0134|H|Management institute|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list|+91 22 2650 5515
+Anjuman-I-Islam's Allana Institute of Management Studies|CST, Fort|+91 22 2270 5207|H|Management institute|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list|+91 22 2262 6028
+Aruna Manharlal Shah Institute of Management and Research|Ghatkopar West|+91 22 2512 6805|H|Management institute|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list|
+Altair Business School|Prabhadevi|+91 22 2438 6279|H|B-school|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list|+91 22 5604 4689
+Atharva College of Engineering|Malad West|+91 22 4029 4949|H|College|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list|
+Atharva Institute of Management Studies|Malad West|+91 84549 51247|H|Management institute|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list|+91 22 4925 9500
+Bharati Vidyapeeth Institute of Management Studies and Research|CBD Belapur|+91 98696 13429|H|Management institute|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Navi Mumbai|targetstudy.com AICTE list|+91 22 2757 2433;+91 22 2756 2582
+Bhavan's Sardar Patel Institute of Technology (SPIT)|Andheri West|+91 22 2670 7440|H|College|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list|+91 22 2628 7250
+Bhavan's Sardar Patel College of Engineering (SPCE)|Andheri West|+91 22 2623 2192|H|College|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list|+91 22 2628 9777
+Bombay Academy of Management Studies|Andheri East|+91 98670 88179|H|Management institute|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Mumbai|targetstudy.com AICTE list|+91 22 2920 1379`;
+HW7.split("\n").forEach((r,i)=>{const[n,a,p,k,t,pr,city,src,p2]=r.split("|");if(!okNum(p))return;if(LEADS.some(x=>d10(x.p)===d10(p)||(x.p2||[]).some(y=>d10(y)===d10(p))))return;LEADS.push({id:1700+i,n,a,city,t,p,c:"IT Hardware",dp:pr.split(";"),src,p2:p2?p2.split(";").filter(okNum):[]})});
+
+const HW8=`K C College of Engineering and Management Studies|Kopri, Thane East|+91 84483 85585|H|College|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Thane|youth4work.com listing (verify)|
+Theem College of Engineering|Boisar East|+91 252 528 4909|H|College|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Palghar|collegebatch.com listing (verify)|+91 252 528 4910
+Shivajirao S. Jondhale College of Engineering|Dombivli East|+91 251 651 2222|H|College|Desktops & Workstations;Laptops;Networking;Projectors & Displays;RAM / Memory;SSD & HDD (internal)|Thane|collegebatch.com listing (verify)|+91 251 248 1544`;
+HW8.split("\n").forEach((r,i)=>{const[n,a,p,k,t,pr,city,src,p2]=r.split("|");if(!okNum(p))return;if(LEADS.some(x=>d10(x.p)===d10(p)))return;LEADS.push({id:1800+i,n,a,city,t,p,c:"IT Hardware",dp:pr.split(";"),src,p2:p2?p2.split(";").filter(okNum):[]})});
+const KIND=l=>l.c==="Security"?"S":l.c==="IT Hardware"?"H":l.c==="Networking & CCTV"?"N":"D";
+const T={
+D:{tag:"Autodesk",open:"Hum Autodesk, Adobe, Trimble, Chaos (V-Ray), Lumion jaise design software ke authorised solutions dete hain.",ask:'"Aap AutoCAD / Revit / 3ds Max kaun sa version use karte hain? Kitne systems pe? Subscription kab renew hoti hai?"',value:"Genuine licence, renewal pe achha rate, multi-seat discount, aur staff training (CADD Masters).",close:'"Main aapko ek quote WhatsApp / email pe bhej deta/deti hoon. Kis number pe bhejun?"',wa:"Hum Autodesk (AutoCAD/Revit/3ds Max), Adobe, Trimble, V-Ray aur Lumion ke licences dete hain. Kya aapko renewal ya naye licences ke liye quote bhejun?",subj:"Design software licences and renewals for ",fuSubj:"design software licences",fuTopic:"design software licences and renewals",mid:"We provide licences and support for design software such as Autodesk (AutoCAD, Revit, 3ds Max), Adobe, Trimble, Chaos (V-Ray) and Lumion.\n\nWe can help your team with:\n- New licences and renewals at a good price\n- Multi-user (team) plans\n- Software training for your staff"},
+S:{tag:"Firewall / Security",open:"Hum IT infrastructure, firewall aur network security ke solutions dete hain.",ask:'"Aapke office mein client data (tax, legal, financial files) kaise protect hota hai? Firewall / antivirus / backup kya hai? Kitne systems aur kaun sa IT vendor dekhta hai?"',value:"Client data ki safety, ransomware se bachav, DPDP Act compliance, Microsoft licensing aur AMC support. Free security audit ka offer rakh sakte ho.",close:'"Main ek chhota IT / security audit ya quote bhejna chahunga. Kis number ya email pe bhejun?"',wa:"Hum firewall, network security aur IT infrastructure solutions dete hain. Kya aapke office ke liye ek chhota security audit ya quote bhejun?",subj:"IT infrastructure and security support for ",fuSubj:"IT and security support",fuTopic:"IT infrastructure and security support",mid:"We provide IT infrastructure and security solutions, including:\n- Firewall, antivirus and data backup\n- Servers, networking, PCs and laptops with maintenance (AMC)\n- Microsoft licensing (Microsoft 365, Windows)\n\nFor firms like yours that handle clients' confidential data, we can do a quick review of your current setup and suggest simple improvements."},
+H:{tag:"Laptop / Desktop / Server",open:"Hum laptop, desktop, workstation, server, storage aur printer jaise IT hardware, aur computer parts (CPU, RAM, SSD, graphics card) ke solutions dete hain, AMC support ke saath.",ask:'"Aapke yahan kitne computers / labs hain aur kitne purane ho gaye hain? Naya purchase ya refresh kab plan hai? Abhi hardware kis vendor se lete hain?"',value:"Branded hardware (Dell, HP, Lenovo) bulk pe achha rate, installation, warranty aur AMC support. Lab / office refresh ke liye ek saath quote.",close:'"Main aapko laptop / desktop / server ka ek quote bhejna chahunga. Kis number ya email pe bhejun, aur kitne units chahiye?"',wa:"Hum laptop, desktop, server, storage aur printer jaise IT hardware bulk pe dete hain, installation aur AMC ke saath. Kya aapko naye purchase ya lab refresh ke liye quote bhejun?",subj:"IT hardware supply and AMC for ",fuSubj:"IT hardware supply",fuTopic:"IT hardware (laptops, desktops, servers) and AMC support",mid:"We supply IT hardware with installation and support, including:\n- Laptops, desktops and workstations\n- Servers and storage (NAS / backup)\n- Printers, monitors, UPS and accessories\n- Computer parts and upgrades (CPU, RAM, SSD, graphics cards, SMPS)\n- Annual maintenance contracts (AMC)\n\nWe can quote for bulk or lab / office refresh requirements."},
+N:{tag:"Network / CCTV",open:"Hum networking (switch, Wi-Fi, structured cabling), firewall aur CCTV surveillance ke solutions dete hain.",ask:'"Campus / office mein Wi-Fi aur network ki coverage kaisi hai? CCTV kitne cameras hain aur recording kitne din ki hai? Koi expansion ya upgrade plan hai?"',value:"Managed switch, Wi-Fi access points, IP CCTV with NVR, cabling aur installation ek hi vendor se. Free site survey ka offer rakh sakte ho.",close:'"Main ek site survey ya quote bhejna chahunga. Kis number ya email pe bhejun?"',wa:"Hum networking, Wi-Fi, firewall aur CCTV surveillance ke solutions dete hain. Kya aapke campus / office ke liye free site survey ya quote bhejun?",subj:"Networking and CCTV solutions for ",fuSubj:"networking and CCTV solutions",fuTopic:"networking, Wi-Fi and CCTV solutions",mid:"We provide networking and surveillance solutions, including:\n- Managed switches, Wi-Fi access points and structured cabling\n- Firewall and network security\n- IP CCTV cameras with NVR and installation\n\nWe can arrange a free site survey and share a quote."}};
+const RES=[["uthaya","Uthaya nahi","c-g"],["busy","Busy, baad mein","c-a"],["no","Interested nahi","c-r"],["wrong","Galat number","c-r2"]];
+const NXT=[["interest","Interested hai","n-g"],["quote","Quote bheja","n-b"],["demo","Demo / meeting fix","n-b"],["won","Deal ho gayi","n-g"]];
+const ALLP=[
+["Software","Autodesk","AutoCAD, Revit, 3ds Max, Maya, AEC Collection. Renewal aur multi-seat discount pe focus. Sabse bada product, har architect/engineer ko pehle yahi pooch."],
+["Software","Adobe","Creative Cloud aur Acrobat. Design studios, marketing aur interior teams ke liye."],
+["Software","Trimble","Construction aur modelling software (jaise SketchUp, Tekla). Structural aur BIM teams ke liye."],
+["Software","Microsoft","Microsoft 365, Windows aur server licensing. CA, law aur financial firms ke liye bhi."],
+["Software","Chaos (V-Ray)","V-Ray aur Enscape rendering. Architects aur interior designers ke visualization ke liye."],
+["Software","Lumion","Real-time architectural visualization. Walkthrough aur renders jaldi chahiye to pitch karo."],
+["Software","D5 Render","Real-time rendering tool. Lumion/V-Ray ka alternative, chhoti studios ko pasand aata hai."],
+["Software","Antivirus / Endpoint","Antivirus, endpoint security aur backup software. Har office ko chahiye, CA/law firms ko pehle pitch karo."],
+["Hardware","Laptops","Business aur design laptops (Dell, HP, Lenovo). Bulk order, staff refresh aur college labs ke liye."],
+["Hardware","Desktops & Workstations","Office desktops aur high-end workstations. AutoCAD, Revit, 3ds Max chalane wale architects ko workstation pitch karo."],
+["Hardware","Servers","Tower aur rack servers. File server, ERP ya data backup chahiye to pooch."],
+["Hardware","Storage & Backup","NAS (Synology, QNAP), external HDD/SSD, backup appliance. Bade drawing files wale architects aur CA/law firms ke liye."],
+["Hardware","Printers & Plotters","Office printer, scanner aur large-format plotter. Architects aur structural consultants ko plotter ki zarurat hoti hai."],
+["Hardware","Monitors & Peripherals","Monitor, keyboard, mouse, docking station, graphics tablet. Laptop ya workstation ke saath upsell karo."],
+["Hardware","Networking","Managed switch, Wi-Fi access point, router, Cat6 cabling, rack. Office aur campus expansion ke liye."],
+["Hardware","Firewall (appliance)","Fortinet, Sophos, SonicWall jaise firewall / UTM. CA, law aur financial firms ko data security ke angle se pitch karo."],
+["Hardware","CCTV & Surveillance","IP / analog camera, NVR / DVR, biometric attendance, access control. Free site survey ka offer rakho."],
+["Hardware","UPS & Power","Online / offline UPS, battery, stabilizer. Server ya workstation wale offices ko hardware ke saath pitch karo."],
+["Hardware","Projectors & Displays","Projector, interactive display, video conferencing. Colleges, training rooms aur meeting rooms ke liye."],
+["Parts","Processors (CPU)","Intel Core / Xeon aur AMD Ryzen / Threadripper. Purane PC ya workstation ka upgrade, aur nayi build ke liye. AutoCAD / Revit users ko high clock-speed CPU pitch karo."],
+["Parts","Motherboards","Intel aur AMD chipset boards (ASUS, Gigabyte, MSI). CPU ke saath bundle karo, workstation aur lab builds ke liye."],
+["Parts","RAM / Memory","DDR4 / DDR5 desktop aur laptop RAM, workstation ke liye ECC. Sabse aasaan upsell: slow PC ko RAM upgrade se tez karo."],
+["Parts","SSD & HDD (internal)","NVMe / SATA SSD aur internal HDD (Samsung, WD, Seagate, Kingston, Crucial). Purane PC ko SSD se tez karna, bade drawing files ke liye extra storage."],
+["Parts","Graphics Cards (GPU)","NVIDIA RTX / Quadro aur AMD cards. V-Ray, Lumion, D5 Render aur 3ds Max chalane wale architects aur interior designers ko pitch karo."],
+["Parts","Power Supply (SMPS)","Branded SMPS (Corsair, Cooler Master, Antec) 450W se 1000W. GPU upgrade ke saath zaroor pooch."],
+["Parts","Cabinets & Cooling","PC cabinet, CPU cooler, cabinet fans aur thermal paste. Lab aur workstation builds ke liye."],
+["Parts","Cables & Accessories","HDMI / DisplayPort, LAN, SATA aur power cables, converters, pen drives, memory cards. Chhota order, lekin repeat kharid hoti hai."],
+["Parts","Laptop Spares","Laptop battery, adapter, keyboard, screen aur RAM / SSD upgrade kits. AMC clients aur college labs ke liye."],
+["Services","BIM Services","BIM modelling aur coordination ki service. Bade architects, structural aur MEP firms ko pitch karo."],
+["Services","Training & Consultancy","Software training aur consultancy. Naye staff ya team upskilling ke liye."],
+["Services","AMC & IT Support","Annual maintenance contract aur IT support. Hardware bechne ke baad recurring income ke liye."]];
+const GROUPS=["Software","Hardware","Parts","Services"];
+const GLBL={Software:"SOFTWARE",Hardware:"IT HARDWARE",Parts:"COMPUTER PARTS (HARDWARE)",Services:"SERVICES"};
+let prod="Sab products";const PARTS=ALLP.filter(p=>p[0]==="Parts").map(p=>p[1]);
+const PR=l=>L(l.id).pr||l.dp||[];
+function togPr(id,i){const o=L(id),n=ALLP[i][1],a=PR(LEADS.find(x=>x.id===id));o.pr=a.includes(n)?a.filter(x=>x!==n):[...a,n];save();render()}
+function prodRow(l){const o=L(l.id),a=PR(l);
+ return `<details style="margin-top:8px"><summary class="sub" style="cursor:pointer">PRODUCT INTEREST${a.length?" ("+a.length+"): "+esc(a.join(", ")):" (tag karo)"}</summary>${GROUPS.map(g=>`<div class="lbl">${GLBL[g]}</div><div style="display:flex;gap:6px;flex-wrap:wrap">${ALLP.map((p,i)=>p[0]===g?`<button class="chip ${a.includes(p[1])?"on":""}" onclick="togPr(${l.id},${i})">${esc(p[1])}</button>`:"").join("")}</div>`).join("")}</details>`}
+const today=new Date().toDateString();
+let S=(()=>{try{return JSON.parse(localStorage.getItem("cd_state")||"null")}catch(e){return null}})()||{leads:{},name:"Mohnish",target:40};
+let tab="aaj",cat="Sab",area="Sab shehar",q="";
+if(!S.name)S.name="Mohnish";
+(S.custom||[]).forEach(l=>LEADS.push(l));
+const save=()=>{stamps();S.ts=Date.now();try{localStorage.setItem("cd_state",JSON.stringify(S))}catch(e){}cloudPush()};
+const L=id=>S.leads[id]||(S.leads[id]={});
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const digits=p=>p.replace(/\D/g,"");
+const isMobile=p=>/^91[6-9]\d{9}$/.test(digits(p));
+const tel=p=>"tel:+"+digits(p);
+function script(l){
+ const me=S.name||"[aapka naam]",t=T[KIND(l)];
+ return `<h3>Kya bolna hai: ${esc(l.n)}</h3>
+<p><b>Opening:</b> "Namaste, main ${esc(me)} bol raha/rahi hoon Genesis Infoserve, Mumbai se. ${t.open} Kya 2 minute baat ho sakti hai?"</p>
+<p><b>Sawaal:</b> ${t.ask}</p>
+<p><b>Value:</b> ${t.value}</p>
+<p><b>Close:</b> ${t.close}</p>
+${l.x?`<p><b>Dhyan rakho:</b> ${esc(l.x)}</p>`:""}
+<button class="sm" onclick="closeM()">Band karo</button>`;
+}
+function showM(h){$("#mbody").innerHTML=h;$("#modal").classList.add("show")}
+function closeM(){$("#modal").classList.remove("show")}
+$("#modal").onclick=e=>{if(e.target.id==="modal")closeM()};
+function opts(list,key,id){const cur=L(id)[key];
+ return `<div class="row">${list.map(([k,t,c])=>`<button class="o ${c} ${cur===k?"on":""}" onclick="setOpt(${id},'${key}','${k}')"><span>${t}</span></button>`).join("")}</div>`}
+function setOpt(id,key,v){const o=L(id);o[key]=o[key]===v?"":v;if(key==="res")o.day=o.res?today:"";save();render()}
+function setNote(id,v){L(id).note=v;save()}
+function copyNum(id){const l=LEADS.find(x=>x.id===id);navigator.clipboard?.writeText(l.p).catch(()=>{});toast("Number copy ho gaya")}
+function toast(m){const t=document.createElement("div");t.textContent=m;t.style.cssText="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#e8f0ee;color:#10201d;padding:8px 16px;border-radius:99px;font-weight:600";document.body.append(t);setTimeout(()=>t.remove(),1400)}
+function B(t){return [...String(t)].map(c=>{const n=c.codePointAt(0);if(n>=65&&n<=90)return String.fromCodePoint(0x1D5D4+n-65);if(n>=97&&n<=122)return String.fromCodePoint(0x1D5EE+n-97);if(n>=48&&n<=57)return String.fromCodePoint(0x1D7EC+n-48);return c}).join("")}
+function mailParts(l,k){const cn=(L(l.id).cn||"").trim(),t=T[KIND(l)];
+ if(k==="fu"){const me=S.name||"[Your Name]";return {subject:"Following up: "+t.fuSubj+" for "+l.n,body:"Dear "+(cn||"Sir/Madam")+",\n\nI am "+me+" from Genesis Infoserve Pvt. Ltd., Mumbai. I am following up on my earlier message/call about "+t.fuTopic+" for "+l.n+".\n\nPlease let me know if you need any details or a quote. I can also arrange a short call at a time that suits you.\n\nThank you,\n"+me+"\nGenesis Infoserve Pvt. Ltd., Mumbai"+(S.phone?"\n"+S.phone:"")}}
+ const me=S.name||"[Your Name]",ph=S.phone?"\n"+S.phone:"";
+ const subject="IT Infrastructure Solutions for "+l.n+" - Genesis Infoserve Pvt. Ltd.";
+ const body=`Dear ${cn||'Sir/Madam'},\n\n${B("Greetings from Genesis Infoserve Pvt. Ltd!")}\n\nHope you are doing good. As discussed, please share your requirement. Meanwhile, I would like to introduce our company, ${B("Genesis Infoserve Pvt. Ltd.")}, a leading name in the ${B("IT Infrastructure Solutions")} industry. With our experienced and certified team to serve you, we are associated with leading brands like ${B("Microsoft, HP and Dell")}, and we are also a ${B("Gold Partner of Autodesk")}.\n\nWe provide world-class IT products, services and consulting to a diversified range of businesses. We have expertise in ${B("Storage/Server, Cloud Solutions and Networking")} under IT Infrastructure Services, and we also deal in Desktops, Laptops, Printers and Workstations. We offer ${B("AMC, FMS and IT consultancy")} to Corporate, SME and Large Corporate Houses ${B("across Pan India")}.\n\nIf you wish to experience our uninterrupted IT solutions, we are here to associate with your company and give you the best and hassle-free solutions on a single platform.\n\n${B("Solutions we provide:")}\n- ${B("Software:")} Office 365, MS Windows, Firewall, Antivirus (Endpoint, Enterprise, Total)\n- Desktop PCs / Laptops (Assembled and Branded)\n- ${B("HP Workstations (our specialization)")} / Dell Workstations\n- Servers / Storage (SAN/NAS)\n- Plotters, Multifunction Printers, Webcams and Conferencing Tools\n- Networking under IT Infrastructure Services (AMC, FMS, IT consultancy) for Corporate, SME and Large Corporate Houses ${B("across Pan India")}\n\nWe provide complete computing infrastructure solutions by integrating best-of-breed technologies and ensuring the desired return on investment by partnering with leading brands. For more information, please go through our company profile or visit our website: www.genesisinfoserve.com\n\nIf you have any other query or doubt, please feel free to contact us.\n\nLooking forward to hearing from you.\n\nBest Regards,\n${B(me)}\n${B("Genesis Infoserve Pvt. Ltd.")}${ph}`;
+ return {subject,body};
+}
+function mailBtns(l){
+ const e=(L(l.id).email||"").trim(),m=mailParts(l),su=encodeURIComponent(m.subject),bo=encodeURIComponent(m.body);
+ return `<a class="sm" style="text-decoration:none" href="mailto:${encodeURIComponent(e)}?subject=${su}&body=${bo}">Email</a><a class="sm" style="text-decoration:none" target="_blank" rel="noopener" href="https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(e)}&su=${su}&body=${bo}">Gmail</a><a class="sm" style="text-decoration:none" target="_blank" rel="noopener" href="https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(e)}&subject=${su}&body=${bo}">Outlook</a><button class="sm" onclick="copyRich(${l.id})">Copy bold mail</button>`+fuBtn(l,e)}
+function emailRow(l){const q=encodeURIComponent(l.n+" "+(l.city||"Mumbai")+" contact email");return `<div style="display:flex;gap:6px;align-items:center"><input type="text" class="em" style="flex:1;margin:0" placeholder="Company ka email (ek baar daalo, phir Email dabao)" value="${esc(L(l.id).email||"")}" onchange="L(${l.id}).email=this.value.trim();save();render()"><a class="sm" style="text-decoration:none;white-space:nowrap" target="_blank" rel="noopener" href="https://www.google.com/search?q=${q}">Email dhundo</a></div>`}
+function importEmails(){
+ const t=document.querySelector("#bulk").value;let ok=0,bad=[];
+ t.split("\n").forEach(r=>{r=r.trim();if(!r)return;
+  const em=(r.match(/[^\s,;|]+@[^\s,;|]+\.[^\s,;|]+/)||[])[0];
+  if(!em){bad.push(r);return}
+  const key=r.replace(em,"").replace(/[,;|\t]/g," ").replace(/\s+/g," ").trim().toLowerCase(),kd=digits(key);
+  const l=LEADS.find(x=>x.n.toLowerCase()===key)||(key.length>3&&LEADS.find(x=>x.n.toLowerCase().includes(key)||key.includes(x.n.toLowerCase())))||(kd.length>=8&&LEADS.find(x=>digits(x.p).endsWith(kd.slice(-10))));
+  if(l){L(l.id).email=em;ok++}else bad.push(r)});
+ save();render();
+ alert(ok+" emails jud gaye."+(bad.length?"\nMatch nahi hue ("+bad.length+"):\n"+bad.slice(0,8).join("\n"):""));
+}
+function fuBtn(l,e){const o=L(l.id);if(!(o.res||o.next))return"";const m=mailParts(l,"fu");return `<a class="sm" style="text-decoration:none" href="mailto:${encodeURIComponent(e)}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}">Follow-up mail</a>`}
+function extraNums(l){return[...(l.p2||[]),...String(L(l.id).px||"").split(/[,;\n]/)].map(x=>x.trim()).filter(x=>x&&okNum(x))}
+function p2html(l){return extraNums(l).map(n=>{let d=digits(n);if(d.length===10)d="91"+d;return `<a class="sm" style="text-decoration:none" href="tel:+${d}">📞 ${esc(n)}</a>`+(isMobile(d)?`<a class="sm wa" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/${d}">WA</a>`:"")}).join("")}
+function extraRow(l){const o=L(l.id),due=o.fu&&new Date(o.fu)<=new Date();
+ const qi=(k,ph,w)=>`<input type="text" class="em" style="width:${w};margin:0" placeholder="${ph}" value="${esc(o[k]||"")}" onchange="L(${l.id}).${k}=this.value.trim();save();render()">`;
+ return `<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center"><input type="text" class="em" style="flex:1;min-width:140px;margin:0" placeholder="Contact person (jaise Mr. Shah)" value="${esc(o.cn||"")}" onchange="L(${l.id}).cn=this.value.trim();save();render()"><label class="sub" style="${due?"color:var(--red);font-weight:700":""}">Follow-up${due?" (due)":""} <input type="datetime-local" value="${esc(o.fu||"")}" onchange="L(${l.id}).fu=this.value;save();render()"></label>${calLink(l)}${assignSel(l)}</div><div style="margin-top:6px"><input type="text" class="em" style="width:100%;margin:0" placeholder="Aur numbers (website wale mobile/direct), comma se alag karo" value="${esc(L(l.id).px||"")}" onchange="L(${l.id}).px=this.value.trim();save();render()"></div>`
+ +(["quote","demo","won"].includes(o.next)?`<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">${qi("qs","Quote: kaun sa software","1fr").replace("width:1fr","flex:1;min-width:140px")}${qi("qu","Users","70px")}${qi("qa","Amount Rs","100px")}</div>`:"")}
+function qIn(v){q=v;render();const e=document.getElementById("q");if(e){e.focus();e.setSelectionRange(v.length,v.length)}}
+function addLeads(arr){let add=0,dup=0;arr.forEach(x=>{if(x.p&&!okNum(x.p)){dup++;return}const d=digits(x.p||"").slice(-10);if(d&&LEADS.some(l=>digits(l.p).slice(-10)===d)){dup++;return}const id=Math.max(...LEADS.map(l=>l.id))+1;const lead={id,n:x.n,a:x.a||"",city:x.city||"Mumbai",t:x.t||"",p:x.p||"",c:x.c||"Design software"};LEADS.push(lead);(S.custom=S.custom||[]).push(lead);if(x.e)L(id).email=x.e;if(x.cn)L(id).cn=x.cn;add++});save();render();return {add,dup}}
+function addForm(){showM(`<h3>Naya lead</h3>`+[["n","Company naam"],["p","Phone"],["e","Email"],["cn","Contact person"],["city","Shehar"],["a","Area"],["t","Type (Architect, CA firm...)"]].map(([k,t])=>`<p><input type="text" id="nf_${k}" placeholder="${t}" style="width:100%"></p>`).join("")+`<p><select id="nf_c" style="width:100%"><option>Design software</option><option>Security</option><option>IT Hardware</option><option>Networking &amp; CCTV</option></select></p><button class="sm" onclick="saveLead()">Save</button> <button class="sm" onclick="closeM()">Band karo</button>`)}
+function saveLead(){const g=k=>document.getElementById("nf_"+k).value.trim();if(!g("n")){alert("Company naam daalo");return}const r=addLeads([{n:g("n"),p:g("p"),e:g("e"),cn:g("cn"),city:g("city"),a:g("a"),t:g("t"),c:g("c")}]);closeM();alert(r.dup?"Ye number pehle se list mein hai.":"Lead jud gaya.")}
+function dl(name,txt,type){saveFile(name,txt,type)}
+function csvParse(t){const rows=[];let r=[],f="",qt=false;for(let i=0;i<t.length;i++){const c=t[i];if(qt){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else qt=false}else f+=c}else if(c=='"')qt=true;else if(c==","){r.push(f);f=""}else if(c=="\n"){r.push(f);rows.push(r);r=[];f=""}else if(c!="\r")f+=c}if(f||r.length){r.push(f);rows.push(r)}return rows}
+function csvOut(){const H=["Company","Area","City","Type","Category","Phone","Email","Contact person","Result","Next step","Follow-up","Quote software","Users","Amount","Note","Products"];const rn=Object.fromEntries(RES.map(x=>[x[0],x[1]])),nn=Object.fromEntries(NXT.map(x=>[x[0],x[1]]));const rows=LEADS.map(l=>{const o=L(l.id);return [l.n,l.a,l.city||"Mumbai",l.t,l.c,l.p,o.email,o.cn,rn[o.res],nn[o.next],o.fu,o.qs,o.qu,o.qa,o.note,PR(l).join("; ")]});dl("calling-leads.csv","\ufeff"+[H,...rows].map(r=>r.map(v=>'"'+String(v||"").replace(/"/g,'""')+'"').join(",")).join("\n"),"text/csv")}
+function importCsvText(t,quiet){const rows=csvParse(t.replace(/^\ufeff/,""));const h=rows.shift().map(x=>x.trim().toLowerCase());const ix=(...k)=>h.findIndex(x=>k.some(y=>x.includes(y)));const iN=ix("company","name","naam"),iP=ix("phone","mobile"),iE=ix("email","mail"),iC=ix("city","shehar"),iA=ix("area","address"),iT=ix("type"),iK=ix("category"),iCn=ix("contact person","person");if(iN<0){if(!quiet)alert("CSV mein 'Company' ya 'Name' column chahiye.");return null}const arr=rows.filter(r=>r[iN]&&r[iN].trim()).map(r=>{const k=iK>=0?r[iK]:"";return {n:r[iN].trim(),p:iP>=0?r[iP]:"",e:iE>=0?r[iE]:"",city:iC>=0?r[iC]:"",a:iA>=0?r[iA]:"",t:iT>=0?r[iT]:"",cn:iCn>=0?r[iCn]:"",c:/network|cctv|surveillance|camera/i.test(k)?"Networking & CCTV":/hardware|laptop|server|college|school/i.test(k)?"IT Hardware":/sec|\bca\b|law|financ|account/i.test(k)?"Security":"Design software"}});return addLeads(arr)}
+function csvIn(inp){const f=inp.files[0];if(!f)return;f.text().then(t=>{const r=importCsvText(t);if(r)alert(r.add+" naye leads jude. "+r.dup+" duplicate (same phone) chhod diye.")});inp.value=""}
+/* ===== Auto new leads (Google Sheet CSV link, har 30 min) ===== */
+let feedMsg="";
+async function feedCheck(manual){const u=(S.feed||"").trim();if(!u){if(manual)alert("Pehle Google Sheet ka CSV link daalo.");return}
+ try{const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw 0;const t=await r.text(),res=importCsvText(t,true);
+  S.feedAt=new Date().toISOString();save();
+  if(!res)feedMsg="Sheet mein 'Company' column nahi mila";
+  else{feedMsg=res.add+" naye, "+res.dup+" duplicate";if(res.add){toast("🆕 "+res.add+" naye leads aaye");render()}else if(manual)toast("Koi naya lead nahi")}}
+ catch(e){feedMsg="Link nahi khula. Sheet 'Publish to web' (CSV) hai? Link check karo."}
+ const el=document.getElementById("feedst");if(el)el.textContent=feedMsg}
+setInterval(()=>feedCheck(false),30*60*1000);setTimeout(()=>feedCheck(false),3000);
+function backup(){dl("calling-desk-backup.json",JSON.stringify(S),"application/json")}
+function restore(inp){const f=inp.files[0];if(!f)return;f.text().then(t=>{try{const d=JSON.parse(t);if(!d.leads)throw 0;S=d;save();location.reload()}catch(e){alert("Ye backup file sahi nahi hai.")}});inp.value=""}
+/* ===== Excel backup (no library) ===== */
+const CRC=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(b){let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
+function zipStore(files){const te=new TextEncoder(),parts=[],cen=[];let off=0;
+ const u16=v=>[v&255,(v>>8)&255],u32=v=>[v&255,(v>>8)&255,(v>>16)&255,(v>>>24)&255];
+ files.forEach(([name,txt])=>{const nb=te.encode(name),d=te.encode(txt),crc=crc32(d);
+  const lh=new Uint8Array([0x50,0x4b,3,4,...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(crc),...u32(d.length),...u32(d.length),...u16(nb.length),...u16(0)]);
+  parts.push(lh,nb,d);
+  cen.push(new Uint8Array([0x50,0x4b,1,2,...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(crc),...u32(d.length),...u32(d.length),...u16(nb.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]),nb);
+  off+=lh.length+nb.length+d.length});
+ const cs=cen.reduce((t,a)=>t+a.length,0);
+ const end=new Uint8Array([0x50,0x4b,5,6,...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(cs),...u32(off),...u16(0)]);
+ const all=[...parts,...cen,end],out=new Uint8Array(all.reduce((t,a)=>t+a.length,0));let p=0;all.forEach(a=>{out.set(a,p);p+=a.length});return out}
+const colL=n=>{let s="";n++;while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26)}return s};
+const xe=v=>String(v).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function sheetXml(rows,widths){
+ const cols=widths?"<cols>"+widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join("")+"</cols>":"";
+ const body=rows.map((r,ri)=>`<row r="${ri+1}">`+r.map((v,ci)=>{const ref=colL(ci)+(ri+1),st=ri===0?' s="1"':"";
+  if(v===""||v==null)return"";
+  if(typeof v==="number"&&isFinite(v))return`<c r="${ref}"${st}><v>${v}</v></c>`;
+  return`<c r="${ref}"${st} t="inlineStr"><is><t xml:space="preserve">${xe(v)}</t></is></c>`}).join("")+"</row>").join("");
+ return'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'+cols+"<sheetData>"+body+"</sheetData></worksheet>"}
+function xlsxBytes(sheets){
+ const H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',n=sheets.length,
+ nm=s=>xe(String(s).replace(/[\\\/\?\*\[\]:]/g,"").slice(0,31)||"Sheet");
+ const files=[
+ ["[Content_Types].xml",H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")+"</Types>"],
+ ["_rels/.rels",H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+ ["xl/workbook.xml",H+'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'+sheets.map((s,i)=>`<sheet name="${nm(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("")+"</sheets></workbook>"],
+ ["xl/_rels/workbook.xml.rels",H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+sheets.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join("")+`<Relationship Id="rId${n+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`],
+ ["xl/styles.xml",H+'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0F6B5F"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>']
+ ].concat(sheets.map((s,i)=>[`xl/worksheets/sheet${i+1}.xml`,sheetXml(s.rows,s.widths)]));
+ return zipStore(files)}
+function dlx(name,sheets){saveFile(name,new Blob([xlsxBytes(sheets)],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}))}
+const XH=["#","Company","Category","Type","City","Area","Phone","Email","Contact person","Call result","Next step","Follow-up","Last call date","Products","Quote software","Users","Amount (Rs)","Note"];
+const XW=[5,34,18,18,12,18,18,28,18,16,18,17,14,36,20,8,12,40];
+function xr(l,i){const o=L(l.id),rn=Object.fromEntries(RES.map(x=>[x[0],x[1]])),nn=Object.fromEntries(NXT.map(x=>[x[0],x[1]])),amt=parseFloat(String(o.qa||"").replace(/[^\d.]/g,""));
+ return[i+1,l.n,l.c,l.t||"",l.city||"Mumbai",l.a||"",l.p||"",o.email||"",o.cn||"",rn[o.res]||"",nn[o.next]||"",(o.fu||"").replace("T"," "),o.day||"",PR(l).join(", "),o.qs||"",o.qu||"",isNaN(amt)?"":amt,o.note||""]}
+const xsheet=(name,list)=>({name,widths:XW,rows:[XH,...list.map(xr)]});
+const stamp=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())};
+const fname=s=>String(s).replace(/[^\w]+/g,"_").replace(/^_|_$/g,"").slice(0,40)||"lead";
+function xlCompany(id){const l=LEADS.find(x=>x.id===id),r=xr(l,0);
+ const rows=[[...XH.slice(1),"Backup date"],[...r.slice(1),new Date().toLocaleString("en-IN")]];
+ dlx(fname(l.n)+"_"+stamp()+".xlsx",[{name:"Company",widths:[...XW.slice(1),20],rows}]);toast("Excel save ho gaya")}
+function xlList(){const l=filtered();dlx("leads_list_"+stamp()+".xlsx",[xsheet("Leads",l)]);toast(l.length+" leads Excel mein")}
+function xlAll(){
+ const all=LEADS,c=k=>all.filter(l=>L(l.id).res===k).length,n=k=>all.filter(l=>L(l.id).next===k).length;
+ const today_=all.filter(l=>L(l.id).day===today),fu=all.filter(l=>{const o=L(l.id);return o.fu||o.res==="busy"||(o.next&&o.next!=="won")}),
+ qv=all.reduce((t,l)=>t+(parseFloat(String(L(l.id).qa||"").replace(/[^\d.]/g,""))||0),0);
+ const sum=[["Item","Value"],["Backup date",new Date().toLocaleString("en-IN")],["Total leads",all.length],
+  ["IT Hardware",all.filter(l=>l.c==="IT Hardware").length],["Networking & CCTV",all.filter(l=>l.c==="Networking & CCTV").length],["Design software",all.filter(l=>l.c==="Design software").length],["Security",all.filter(l=>l.c==="Security").length],
+  ["Total calls done",all.filter(l=>L(l.id).res).length],["Aaj ke calls",today_.length],["Uthaya nahi",c("uthaya")],["Busy, baad mein",c("busy")],["Interested nahi",c("no")],["Galat number",c("wrong")],
+  ["Interested hai",n("interest")],["Quote bheja",n("quote")],["Demo / meeting",n("demo")],["Deal ho gayi",n("won")],["Quote pipeline (Rs)",qv],
+  ["Leads with email",all.filter(l=>(L(l.id).email||"").trim()).length],["Follow-ups pending",fu.length]];
+ ALLP.forEach(p=>{const k=all.filter(l=>PR(l).includes(p[1])).length;if(k)sum.push(["Product: "+p[1],k])});
+ const hw=all.filter(l=>["H","N"].includes(KIND(l)));
+ dlx("calling-desk-backup_"+stamp()+".xlsx",[{name:"Summary",widths:sum.slice(1).map(()=>18),rows:[sum.slice(1).map(x=>x[0]),sum.slice(1).map(x=>x[1])]},xsheet("All Leads",all),xsheet("Hardware Leads",hw),xsheet("Follow-ups",fu),xsheet("Quotes",all.filter(l=>L(l.id).qa)),xsheet("Aaj ke calls",today_)]);
+ S.lastXl=new Date().toISOString();save();render();toast("Excel backup ho gaya")}
+function xlAgo(){if(!S.lastXl)return"Excel backup abhi tak nahi liya";const m=Math.round((Date.now()-new Date(S.lastXl))/60000);return"Last Excel backup: "+(m<1?"abhi":m<60?m+" min pehle":m<1440?Math.round(m/60)+" ghante pehle":Math.round(m/1440)+" din pehle")}
+
+/* ===== PRO: cloud sync, AI script, reminders ===== */
+let cloudDoc=null,cloudT=null,cloudMsg="",AI=null;const H={};
+function stamps(){Object.entries(S.leads).forEach(([id,o])=>{const{lt,...r}=o,j=JSON.stringify(r);if(H[id]!==j){o.lt=Date.now();if(S.me)o.by=S.me;const{lt:_a,...r2}=o;H[id]=JSON.stringify(r2)}})}
+function rehash(){Object.entries(S.leads).forEach(([id,o])=>{const{lt,...r}=o;H[id]=JSON.stringify(r)})}
+function tot(){const e=document.getElementById("tot");if(e&&window.lastTot)e.textContent=window.lastTot+(cloudMsg?" · "+cloudMsg:"")}
+function cloudPush(){if(!cloudDoc)return;clearTimeout(cloudT);cloudT=setTimeout(()=>{cloudDoc.set(JSON.parse(JSON.stringify(S))).then(()=>{cloudMsg="☁ synced";tot()}).catch(()=>{cloudMsg="☁ sync error";tot()})},1500)}
+function mergeRemote(r){let ch=false;
+ Object.entries(r.leads||{}).forEach(([id,ro])=>{const lo=S.leads[id];if(!lo||(ro.lt||0)>(lo.lt||0)){S.leads[id]=ro;ch=true}});
+ (r.custom||[]).forEach(c=>{if(!LEADS.some(l=>l.id===c.id||(c.p&&digits(l.p).slice(-10)===digits(c.p).slice(-10)))){LEADS.push(c);(S.custom=S.custom||[]).push(c);ch=true}});
+ rehash();if(ch){try{localStorage.setItem("cd_state",JSON.stringify(S))}catch(e){}}return ch}
+function idle(){const a=document.activeElement;return!a||!/INPUT|TEXTAREA|SELECT/.test(a.tagName)}
+
+
+function gSearch(v){const box=document.getElementById("gres");const t=v.toLowerCase().trim().split(/\s+/).filter(Boolean);if(!t.length){box.innerHTML="";return}
+ const hit=LEADS.filter(l=>{const o=L(l.id);const h=[l.n,l.a,l.city,l.t,l.c,l.p,...(l.p2||[]),o.px,o.email,o.cn,o.note,o.res,o.by,o.as].join(" ").toLowerCase();const hd=h.replace(/\D/g,"");return t.every(w=>h.includes(w)||(/^\d{3,}$/.test(w)&&hd.includes(w)))});
+ box.innerHTML=`<div class="sub" style="margin:6px 2px">${hit.length} mile${hit.length>12?" (pehle 12 dikha raha hoon)":""}</div>`+hit.slice(0,12).map(l=>`<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px 10px;margin-bottom:5px;border:1px solid var(--line,#2a3a37);border-radius:10px;cursor:pointer" onclick="gJump(${l.id})"><span><b>${esc(l.n)}</b><br><span class="sub">${esc(l.a||"")} · ${esc(l.c)} · ${esc(l.p)}</span></span><a class="sm" style="text-decoration:none" href="${tel(l.p)}" onclick="event.stopPropagation()">Call</a></div>`).join("")}
+function gJump(id){const l=LEADS.find(x=>x.id===id);tab="aaj";cat="Sab";area="Sab shehar";prod="Sab products";q=l.n;document.getElementById("gq").value="";document.getElementById("gres").innerHTML="";render();window.scrollTo({top:0,behavior:"smooth"})}
+async function gsPull(){try{const s2=await cloudDoc.get();if(s2.exists&&mergeRemote(s2.data())&&idle())render()}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&typeof cloudDoc!=="undefined"&&cloudDoc)gsPull()});
+function cfgLink(){if(!S.cloud||!S.me){alert("Pehle Web App URL aur naam daalo.");return}const u=location.href.split("#")[0]+"#cfg="+btoa(unescape(encodeURIComponent(JSON.stringify({c:S.cloud,m:S.me}))));navigator.clipboard.writeText(u).then(()=>toast("Setup link copy ho gaya (PIN isme nahi hai)"))}
+(()=>{const m=location.hash.match(/^#cfg=(.+)$/);if(!m)return;try{const c=JSON.parse(decodeURIComponent(escape(atob(m[1]))));S.cloud=c.c;S.me=c.m;save();history.replaceState(null,"",location.pathname);setTimeout(()=>{tab="rep";render();toast("Setup mil gaya, ab apna PIN daalo aur Connect dabao")},800)}catch(e){}})();
+/* ===== Team cloud (Google Apps Script), verify, calendar, bold mail ===== */
+let gsT=null;
+function gsDocMk(){const post=o=>fetch(S.cloud,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({user:S.me,pin:S.pin,...o})}).then(r=>r.json()).then(r=>{if(r.err)throw new Error(r.err);if(r.users)S.users=r.users;return r});
+ return{get:async()=>{const r=await post({a:"load"});return{exists:!!r.state,data:()=>r.state}},
+  set:async st=>{const info={};Object.entries(st.leads).forEach(([id,o])=>{if(!(o.res||o.next||o.note||o.email||o.cn||o.fu||o.as))return;const l=LEADS.find(x=>String(x.id)===id);if(l)info[id]=[l.n,l.p,l.c]});const r=await post({a:"save",state:{leads:st.leads,custom:st.custom||[]},info});if(r.state&&mergeRemote(r.state)&&idle())render()}}}
+async function gsInit(manual){if(!S.cloud||!S.me){if(manual)alert("Web App URL, naam aur PIN daalo.");return}
+ cloudDoc=gsDocMk();try{const sn=await cloudDoc.get();if(sn.exists&&mergeRemote(sn.data()))render();cloudMsg="☁ team sync ON ("+S.me+")";tot();save();render();
+  clearInterval(gsT);gsT=setInterval(gsPull,30000);if(manual)toast("Connect ho gaya")}
+ catch(e){cloudDoc=null;cloudMsg="☁ login/sync error";tot();if(manual)alert("Connect nahi hua: "+e.message)}}
+const vState=l=>{const o=L(l.id);return o.res==="wrong"?"x":((o.res&&o.res!=="uthaya")||o.next)?"v":"u"};
+const vBadge=l=>({x:'<span class="tag" style="color:var(--red)">✗ Galat number</span>',v:'<span class="tag" style="color:#4cd39a">✓ Verified (call)</span>',u:'<span class="tag" style="color:var(--amber)">⚠ Unverified</span>'})[vState(l)];
+function assignSel(l){if(!(S.users||[]).length)return"";const o=L(l.id);return `<select class="em" style="margin:0;max-width:150px" onchange="L(${l.id}).as=this.value;save();render()"><option value="">Assign: koi nahi</option>${S.users.map(u=>`<option ${o.as===u?"selected":""}>${esc(u)}</option>`).join("")}</select>`+(o.by?`<span class="sub">last: ${esc(o.by)}</span>`:"")}
+function calLink(l){const o=L(l.id);if(!o.fu)return"";const f=d=>d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")+"T"+String(d.getHours()).padStart(2,"0")+String(d.getMinutes()).padStart(2,"0")+"00",a=new Date(o.fu),b=new Date(a.getTime()+15*6e4);
+ return `<a class="sm" style="text-decoration:none" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Call: "+l.n)}&dates=${f(a)}/${f(b)}&details=${encodeURIComponent(l.p+" | "+(o.note||""))}">📅 Calendar</a>`}
+function filtBar(){return `<div style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap"><button class="sm" style="${S.unv?"outline:2px solid var(--amber)":""}" onclick="S.unv=!S.unv;save();render()">⚠ Sirf Unverified</button>${(S.users||[]).length?`<button class="sm" style="${S.mine?"outline:2px solid var(--amber)":""}" onclick="S.mine=!S.mine;save();render()">👤 Meri leads</button>`:""}</div>`}
+const unB=c=>{const n=c.codePointAt(0);return n>=0x1D5D4&&n<=0x1D5ED?String.fromCharCode(65+n-0x1D5D4):n>=0x1D5EE&&n<=0x1D607?String.fromCharCode(97+n-0x1D5EE):n>=0x1D7EC&&n<=0x1D7F5?String.fromCharCode(48+n-0x1D7EC):null};
+function richMail(l){const m=mailParts(l);let h="",pl="",ib=false;for(const c of m.body){const u=unB(c);if(u!==null){if(!ib){h+="<b>";ib=true}h+=esc(u);pl+=u}else{if(ib){h+="</b>";ib=false}h+=c==="\n"?"<br>":esc(c);pl+=c}}if(ib)h+="</b>";return{html:'<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt">'+h+"</div>",plain:pl}}
+function copyRich(id){const r=richMail(LEADS.find(x=>x.id===id));try{navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([r.html],{type:"text/html"}),"text/plain":new Blob([r.plain],{type:"text/plain"})})]).then(()=>toast("Bold mail copy: Outlook/Gmail mein Ctrl+V karo"))}catch(e){navigator.clipboard.writeText(r.plain);toast("Plain mail copy hua")}}
+(async()=>{try{if(!window.claude||!claude.use){setTimeout(()=>gsInit(false),500);return}
+ claude.use("sample").then(s=>{if(s){AI=s;render()}}).catch(()=>{});
+ const db=await claude.use("db");if(!db)return;cloudDoc=db.doc("crm/state");
+ try{const sn=await cloudDoc.get();if(sn&&sn.exists&&mergeRemote(sn.data()))render()}catch(e){}
+ cloudMsg="☁ cloud sync ON";tot();cloudPush();
+ cloudDoc.onSnapshot(sn=>{if(sn&&sn.exists&&mergeRemote(sn.data())&&idle())render()},()=>{})
+}catch(e){}})();
+async function saveFile(name,data,type){try{const D=window.claude&&await claude.use("downloads");if(D){await D.save({filename:name,data});return}}catch(e){if(e&&e.code==="declined")return}
+ const a=document.createElement("a");a.href=URL.createObjectURL(data instanceof Blob?data:new Blob([data],{type}));a.download=name;document.body.append(a);a.click();a.remove()}
+window.alert=m=>showM("<p style='white-space:pre-wrap'>"+esc(m)+"</p><button class='sm' onclick='closeM()'>OK</button>");
+function dueList(){const n=new Date();return LEADS.filter(l=>{const o=L(l.id);return o.fu&&new Date(o.fu)<=n&&o.next!=="won"})}
+function dueBanner(){const d=dueList();const fb=filtBar();if(!d.length)return fb;return fb+`<div class="box" style="border-color:var(--amber);margin-bottom:12px"><b style="color:var(--amber)">⏰ ${d.length} follow-up due hain</b> <span class="sub">${d.slice(0,3).map(l=>esc(l.n)).join(", ")}${d.length>3?"…":""}</span><div style="margin-top:6px"><button class="sm" onclick="tab='fu';render()">Follow-ups dekho</button> <button class="sm" onclick="askNotif()">Notification ON</button></div></div>`}
+function askNotif(){if(!("Notification" in window))return alert("Is browser mein notification nahi hai.");Notification.requestPermission().then(p=>{if(p==="granted"){new Notification("Daily Calling Desk",{body:"Notification ON ho gaye."});toast("Notification ON")}})}
+setInterval(()=>{if(window.Notification&&Notification.permission==="granted"){const d=dueList(),k=d.map(l=>l.id).join(",");if(d.length&&k!==window.lastDue){window.lastDue=k;new Notification("⏰ "+d.length+" follow-up due",{body:d.slice(0,3).map(l=>l.n).join(", ")})}}},60000);
+async function aiScript(id){const l=LEADS.find(x=>x.id===id),o=L(id),me=S.name||"[aapka naam]";
+ showM("<h3>AI script: "+esc(l.n)+"</h3><p class='sub'>Bana raha hu…</p>");
+ try{const r=await AI("Tum Genesis Infoserve (Mumbai, IT hardware, software aur security reseller) ke cold-calling sales coach ho. Hinglish mein 30 second ka call script likho: opening, 2 sawaal, value line, close. Sirf script do, chhota rakho.\nSalesperson: "+me+"\nLead: "+l.n+", "+(l.t||"")+", "+(l.a||"")+", "+(l.city||"Mumbai")+"\nCategory: "+l.c+"\nProducts: "+(PR(l).join(", ")||"general")+"\nPichla result: "+(o.res||"nayi call")+"\nNote: "+(o.note||"-")+(l.x?"\nDhyan: "+l.x:""),{modelTier:"quick"});
+  showM("<h3>AI script: "+esc(l.n)+"</h3><div style='white-space:pre-wrap'>"+esc(r.text)+"</div><p><button class='sm' onclick='closeM()'>Band karo</button></p>")}
+ catch(e){showM("<h3>AI script</h3><p>Abhi nahi ban paya ("+esc((e&&e.code)||"error")+").</p><button class='sm' onclick='closeM()'>Band karo</button>")}}
+
+function card(l){
+ const o=L(l.id);
+ const st=o.next?NXT.find(x=>x[0]===o.next)[1]:o.res?RES.find(x=>x[0]===o.res)[1]:"Naya";
+ const wa=isMobile(l.p)?`<a class="sm wa" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/${digits(l.p)}?text=${encodeURIComponent("Namaste, main "+(S.name||"")+" Genesis Infoserve, Mumbai se. "+T[KIND(l)].wa)}">WhatsApp</a>`:"";
+ const q=encodeURIComponent(l.n+" "+l.a+" "+(l.city||"Mumbai"));
+ return `<section class="lead"><div class="top"><div><h2>${esc(l.n.toUpperCase())}</h2><div class="sub">${esc(l.a)}, ${esc(l.city||"Mumbai")} · ${esc(l.t)} <span class="tag">${esc(l.c)}</span> <span class="tag">${T[KIND(l)].tag}</span></div></div>${vBadge(l)}<span class="st">${st}</span></div>
+<div class="phone"><a class="num" href="${tel(l.p)}">${esc(l.p)}</a>${p2html(l)}<button class="sm" onclick="copyNum(${l.id})">Copy</button>${wa}${mailBtns(l)}<button class="sm" onclick="showM(script(LEADS.find(x=>x.id===${l.id})))">Kya bolna hai</button><button class="sm" onclick="xlCompany(${l.id})">Excel backup</button>${AI?`<button class="sm" onclick="aiScript(${l.id})">✨ AI script</button>`:""}</div>
+${emailRow(l)}${extraRow(l)}<div class="lbl">CALL KA RESULT</div>${opts(RES,"res",l.id)}
+<div class="lbl">AAGE KA STEP</div>${opts(NXT,"next",l.id)}
+${prodRow(l)}<textarea placeholder="Note: kisse baat hui, kya chahiye" oninput="setNote(${l.id},this.value)">${esc(o.note||"")}</textarea>
+<div class="src">Source: ${l.src?esc(l.src)+" · ":""}<a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">Google Maps</a></div></section>`}
+const RANK=l=>({H:0,N:1,D:2,S:3})[KIND(l)];
+function filtered(){return filtered0().sort((a,b)=>RANK(a)-RANK(b))}
+function filtered0(){const t=q.trim().toLowerCase();return LEADS.filter(l=>(!S.unv||vState(l)==="u")&&(!S.mine||L(l.id).as===S.me)&&(cat==="Sab"||l.c===cat)&&(prod==="Sab products"||(prod==="__parts"?PR(l).some(x=>PARTS.includes(x)):PR(l).includes(prod)))&&(area==="Sab shehar"||(l.city||"Mumbai")===area)&&(!t||(l.n+" "+l.a+" "+(l.city||"")+" "+l.p+" "+(L(l.id).cn||"")).toLowerCase().includes(t)))}
+function render(){
+ const all=LEADS,calls=all.filter(l=>L(l.id).day===today).length;
+ $("#done").textContent=calls;{const hw=all.filter(l=>["H","N"].includes(KIND(l))).length,sw=all.filter(l=>KIND(l)==="D").length,sc=all.filter(l=>KIND(l)==="S").length;window.lastTot="Total leads: "+all.length+" · Hardware "+hw+" · Design "+sw+" · Security "+sc+" · "+xlAgo();tot()}$("#tgt").textContent=S.target;$("#fill").style.width=Math.min(100,calls/S.target*100)+"%";
+ const fu=all.filter(l=>{const o=L(l.id);return o.fu||o.res==="busy"||(o.next&&o.next!=="won")}).sort((a,b)=>(L(a.id).fu||"9").localeCompare(L(b.id).fu||"9"));
+ const tl=[["aaj","Aaj ki list"],["fu","Follow-up",fu.length],["sab","Sab leads"],["prod","Products"],["rep","Report"]];
  $("#tabs").innerHTML=tl.map(([k,t,n])=>`<button class="${tab===k?"on":""}" onclick="tab='${k}';render()">${t}${n!==undefined?`<span class="n">${n}</span>`:""}</button>`).join("")+'<button class="bk" onclick="xlAll()">⬇ Excel backup</button>';
  let h="";
  if(["aaj","sab","fu"].includes(tab)){
@@ -8,7 +643,7 @@
   <select onchange="prod=this.value;render()"><option value="Sab products">Sab products</option><option value="__parts" ${prod==="__parts"?"selected":""}>Computer Parts (sab)</option>${GROUPS.map(g=>`<optgroup label="${GLBL[g]}">${ALLP.filter(p=>p[0]===g).map(p=>`<option ${p[1]===prod?"selected":""}>${esc(p[1])}</option>`).join("")}</optgroup>`).join("")}</select>
   <input type="text" id="q" placeholder="Search naam / phone" value="${esc(q)}" oninput="qIn(this.value)" style="width:150px"><button class="sm" onclick="addForm()">+ Naya lead</button><button class="sm" onclick="xlList()">Excel (is list)</button><label class="me">Aapka naam <input type="text" value="${esc(S.name)}" placeholder="script/email mein aayega" onchange="S.name=this.value;save();render()"></label><label class="me" style="margin-left:0">Aapka phone <input type="text" value="${esc(S.phone||"")}" placeholder="email mein aayega" onchange="S.phone=this.value;save();render()"></label></div>`;
   let list=filtered();
-  if(tab==="aaj")list=list.filter(l=>window.CD?(CD.state.days[CD.day()]?.ids||[]).includes(CD.cloudId(l.id)):!L(l.id).res);
+  if(tab==="aaj")list=list.filter(l=>{const o=L(l.id);return !o.res||o.day===today||o.res==="busy"});
   if(tab==="fu")list=fu.filter(l=>list.includes(l));
   h+=list.length?list.map(card).join(""):`<div class="empty">${tab==="fu"?"Abhi koi follow-up nahi.":"Is filter mein koi lead nahi."}</div>`;
  }
@@ -22,92 +657,11 @@
  if(tab==="rep"){const have=LEADS.filter(l=>(L(l.id).email||"").trim()).length;h+=`<div class="box" style="margin-top:16px"><b>Emails ek saath daalo</b> <span class="sub">(abhi ${have} / ${LEADS.length} companies ka email hai)</span><div class="sub" style="margin:6px 0">Har line mein company ka naam (ya phone number) aur email, comma se alag. Jaise:<br>SSA Architects, info@ssaarchitects.com<br>+91 99670 33533, contact@collaborativearchitecture.com</div><textarea id="bulk" placeholder="Company naam, email"></textarea><button class="sm" onclick="importEmails()">Emails jodo</button></div>`}
 if(tab==="rep"){const qv=LEADS.reduce((t,l)=>t+(parseFloat(String(L(l.id).qa||"").replace(/[^\d.]/g,""))||0),0),qn=LEADS.filter(l=>L(l.id).qa).length;h+=`<div class="box" style="margin-top:16px"><b>Quote pipeline</b>: Rs ${qv.toLocaleString("en-IN")} <span class="sub">(${qn} quotes, amount "Quote bheja / Demo / Deal ho gayi" wale card mein bharo)</span></div><div class="box"><b>Product interest</b><div class="sub" style="margin-top:6px">${ALLP.map(p=>[p[1],LEADS.filter(l=>PR(l).includes(p[1])).length]).filter(x=>x[1]).map(x=>x[0]+": "+x[1]).join(" · ")||"Abhi kisi lead pe product tag nahi hai."}</div></div><div class="box"><b>Backup aur CSV</b><div class="sub" style="margin:6px 0">Backup mein aapka sab data save hota hai: results, notes, emails, follow-ups aur naye leads.</div><button class="sm" onclick="xlAll()">Excel backup (sab kuch)</button> <button class="sm" onclick="backup()">Backup download</button> <label class="sm" style="display:inline-block">Backup restore<input type="file" accept=".json" hidden onchange="restore(this)"></label> <button class="sm" onclick="csvOut()">CSV export</button> <label class="sm" style="display:inline-block">CSV import<input type="file" accept=".csv" hidden onchange="csvIn(this)"></label><div class="sub" style="margin-top:6px">CSV import: pehli row mein Company, Phone, Email, City, Area, Type, Category jaise column naam rakho. Same phone wale duplicate chhod diye jaate hain.</div></div>`}
 if(tab==="rep"){h+=`<div class="box" style="margin-top:16px"><b>🆕 Auto new leads (har 30 min)</b><div class="sub" style="margin:6px 0">Google Sheet mein naye leads daalo (columns: Company, Phone, Email, City, Area, Type, Category). File &gt; Share &gt; Publish to web &gt; CSV chuno, link yahan daalo. Page khula hoga to har 30 min mein naye leads apne aap jud jayenge; same phone wale duplicate skip hote hain.</div><input type="text" style="width:100%" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv" value="${esc(S.feed||"")}" onchange="S.feed=this.value.trim();save()"><div style="margin-top:6px"><button class="sm" onclick="feedCheck(true)">Abhi check karo</button> <span class="sub" id="feedst">${esc(feedMsg||(S.feedAt?"Last check: "+new Date(S.feedAt).toLocaleTimeString("en-IN"):""))}</span></div></div>`}
-if(tab==="rep"){h+=`<div class="box" style="margin-top:16px"><b>☁ Team cloud + login</b><div class="sub" style="margin:6px 0">Code.gs ko private Google Sheet ke Apps Script mein deploy karo. Device setup mein /exec URL aur Script Properties wala PASSWORD daalo. Team data phone/laptop par sync hoga.</div><input type="text" style="width:100%" placeholder="Web App URL (https://script.google.com/macros/s/.../exec)" value="${esc(S.cloud||"")}" onchange="S.cloud=this.value.trim();save()"><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><input type="text" placeholder="Mera naam" style="flex:1" value="${esc(S.me||"")}" onchange="S.me=this.value.trim();save()"><input type="password" placeholder="Device password" style="width:100px" value="${esc(S.pin||"")}" onchange="S.pin=this.value.trim();save()"><button class="sm" onclick="gsInit(true)">Connect / Sync</button><button class="sm" onclick="askNotif()">🔔 Reminder ON</button><button class="sm" onclick="cfgLink()">📋 Doosre device ka setup link</button></div></div>`}
+if(tab==="rep"){h+=`<div class="box" style="margin-top:16px"><b>☁ Team cloud + login</b><div class="sub" style="margin:6px 0">team_backend.gs ko Google Apps Script mein Web App bana ke uska /exec link yahan daalo. Team members apna naam + PIN se judte hain, aur data sab ke phone/laptop par sync hota hai.</div><input type="text" style="width:100%" placeholder="Web App URL (https://script.google.com/macros/s/.../exec)" value="${esc(S.cloud||"")}" onchange="S.cloud=this.value.trim();save()"><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><input type="text" placeholder="Mera naam" style="flex:1" value="${esc(S.me||"")}" onchange="S.me=this.value.trim();save()"><input type="password" placeholder="PIN" style="width:100px" value="${esc(S.pin||"")}" onchange="S.pin=this.value.trim();save()"><button class="sm" onclick="gsInit(true)">Connect / Sync</button><button class="sm" onclick="askNotif()">🔔 Reminder ON</button><button class="sm" onclick="cfgLink()">📋 Doosre device ka setup link</button></div></div>`}
 $("#view").innerHTML=h;
 }
 $("#date").textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"});
 render();
-/* Additive cloud/mail/assistant features. Original controls and exports stay intact. */
-(()=>{
-'use strict';
-const SHEET_URL = ''; // Public /exec URL only; empty keeps local-only mode.
-const cats={arch:'Architect / interior',print:'Printing',prtL:'Large-format print',adv:'Advocate',ca:'CA firm',hosp:'Hospital / hotel',it:'IT',edu:'Education'};
-const statuses={na:'Uthaya nahi',cb:'Busy / baad mein',int:'Interested',quote:'Quote bheja',demo:'Demo / meeting',won:'Deal ho gayi',no:'Interested nahi',bad:'Galat number'};
-const fwd={uthaya:'na',busy:'cb',interest:'int',quote:'quote',demo:'demo',won:'won',no:'no',wrong:'bad'},rev={na:'uthaya',cb:'busy',int:'interest',quote:'quote',demo:'demo',won:'won',no:'no',bad:'wrong'};
-const tabNames={aaj:'Aaj ki list',fu:'Follow-up',sab:'Sab leads',prod:'Products',rep:'Report',replies:'Replies',madad:'Madad'};
-const products=['Autodesk','CorelDRAW','Firewall'];
-const e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const uid=()=>crypto.randomUUID(),d10=s=>String(s||'').replace(/\D/g,'').slice(-10),$=s=>document.querySelector(s);
-function read(k,f){try{return JSON.parse(localStorage.getItem(k))??f;}catch{return f;}}
-function day(d=new Date()){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);}
-function plus(n){return day(new Date(new Date(day()+'T12:00:00+05:30').getTime()+Number(n)*86400000));}
-function validDate(s){return s===''||/^\d{4}-\d{2}-\d{2}$/.test(s)&&!isNaN(Date.parse(s))&&new Date(s+'T12:00:00Z').toISOString().slice(0,10)===s;}
-let E=read('cd.v1',{leads:{},days:{},pool:[],templates:{}});E.leads=E.leads||{};E.days=E.days||{};E.pool=E.pool||[];E.templates=E.templates||{};
-let outbox=read('cd.outbox',[]),busy=false,catalogSent=false,chat=[],replies=[],extras=[],quota=null,openId='',confirmFn=null,mailPlan=null,efilter=null,cache=new Map();
-function config(){return {url:localStorage.getItem('cd.url')||S.cloud||SHEET_URL,key:localStorage.getItem('cd.key')||S.pin||'',me:localStorage.getItem('cd.me')||S.me||S.name||''};}
-function category(l){return l.category||(/hospital|hotel/i.test(l.t)?'hosp':/college|school|university|institute|polytechnic|coaching/i.test(l.t)?'edu':/law/i.test(l.t)?'adv':l.c==='Security'?'ca':l.c==='Design software'?'arch':'it');}
-function cloudId(id){return String(LEADS.find(l=>l.id===Number(id))?.cloudId||id);}
-function localId(id){if(/^\d+$/.test(String(id)))return Number(id);let n=0n;for(const c of String(id))n=(n*131n+BigInt(c.codePointAt(0)))%281474976710656n;return Number(n)+1000000000;}
-function merge(a,b){a=a||{};const win=(b.updatedAt||0)>=(a.updatedAt||0)?b:a;const logs=new Map();[...(a.log||[]),...(b.log||[])].forEach(x=>{if(x?.id)logs.set(x.id,x);});return {...win,log:[...logs.values()].sort((a,b)=>a.at-b.at)};}
-function leadDoc(id){const l=LEADS.find(x=>x.id===Number(id));if(!l)throw Error('Lead nahi mila');const o=L(l.id);return {id:cloudId(l.id),name:l.n,phone:l.p,category:category(l),city:l.city||'Mumbai',source:l.src||'Existing list',website:l.website||'',addedAt:l.addedAt||'',custom:!!l.custom,status:fwd[o.next]||fwd[o.res]||'',email:o.email||'',followup:(o.fu||'').slice(0,10),followedUpOn:o.followedUpOn||'',note:o.note||'',product:o.mailProduct||'',updatedAt:Number(o.updatedAt||o.lt)||0,log:o.log||[],legacy:{...o},legacyLead:{...l}};}
-function fingerprint(o){const {lt,updatedAt,...rest}=o;return JSON.stringify(rest);}
-function persist(){localStorage.setItem('cd.v1',JSON.stringify(E));localStorage.setItem('cd.outbox',JSON.stringify(outbox));localStorage.setItem('cd_state',JSON.stringify(S));}
-function queue(t,doc){outbox.push({id:uid(),t,doc:JSON.parse(JSON.stringify(doc))});persist();}
-function changed(){for(const l of LEADS){const o=L(l.id),j=fingerprint(o);if(cache.get(l.id)===j)continue;cache.set(l.id,j);if(!Object.keys(o).length)continue;const hasData=Object.keys(o).some(k=>!['lt','updatedAt','log'].includes(k));if(!hasData)continue;o.updatedAt=Math.max(Date.now(),Number(o.updatedAt||0)+1);const d=leadDoc(l.id);E.leads[d.id]=merge(E.leads[d.id],d);queue('lead',E.leads[d.id]);}persist();if(config().url&&config().key)setTimeout(sync,30);}
-function addRemoteLead(d){let l=LEADS.find(x=>cloudId(x.id)===String(d.id));if(l)return l;if(LEADS.some(x=>d10(x.p)&&d10(x.p)===d10(d.phone)))return null;const id=localId(d.id);if(LEADS.some(x=>x.id===id))throw Error('Lead ID conflict; data safe rakha hai');l={...(d.legacyLead||{}),id,n:d.name||'Company',p:d.phone||'',city:d.city||'Mumbai',category:d.category,c:['ca','adv'].includes(d.category)?'Security':['arch','print','prtL'].includes(d.category)?'Design software':'IT Hardware',t:cats[d.category]||'',src:d.source||'Google Maps (auto)',website:d.website||'',addedAt:d.addedAt||'',cloudId:String(d.id),custom:true};LEADS.push(l);(S.custom=S.custom||[]).push(l);return l;}
-function apply(d){const l=addRemoteLead(d);if(!l)return;const old=L(l.id),oldDoc=leadDoc(l.id),m=merge(oldDoc,d),o={...(m.legacy||old),email:m.email||'',note:m.note||'',fu:m.followup?m.followup+(m.legacy?.fu?.length>10?m.legacy.fu.slice(10):'T09:00'):'',followedUpOn:m.followedUpOn||'',mailProduct:m.product||'',updatedAt:m.updatedAt,log:m.log};if(m.status){if(['int','quote','demo','won'].includes(m.status)){o.next=rev[m.status];if(!m.legacy)o.res='';}else{o.res=rev[m.status];o.next='';}}else{o.res='';o.next='';}const last=m.log.filter(x=>x.type==='status').at(-1);if(last)o.day=new Date(last.at).toDateString();S.leads[l.id]=o;cache.set(l.id,fingerprint(o));E.leads[m.id]=m;}
-function freeze(){if(E.days[day()])return;const d={id:day(),ids:LEADS.filter(l=>!L(l.id).res&&!L(l.id).next).slice(0,40).map(l=>cloudId(l.id))};E.days[d.id]=d;queue('day',d);}
-function indicator(text){const n=$('#cd-sync');if(n)n.textContent=text;}
-function notify(text){let n=$('#cd-notice');if(!n){n=document.createElement('p');n.id='cd-notice';n.setAttribute('role','alert');document.querySelector('header').after(n);}n.textContent=text;}
-async function api(body){const c=config();if(!c.url||!c.key)throw Error('Setup mein Web App URL aur password daalo');if(!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(c.url))throw Error('Apps Script ka /exec URL chahiye');const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),45000);try{const r=await fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:c.key,...body}),signal:controller.signal});if(!r.ok)throw Error('Server HTTP '+r.status);const b=await r.json();if(!b.ok)throw Error(b.error||'Server error');return b;}finally{clearTimeout(timer);}}
-async function sync(){if(busy)return;if(!config().url||!config().key){indicator(config().url?'Setup chahiye':'Sirf is device par');return;}busy=true;indicator('sync ho raha hai');try{if(!catalogSent){await api({ops:[{t:'catalog',phones:LEADS.filter(l=>!l.cloudId).map(l=>d10(l.p))}]});catalogSent=true;}let rounds=0;while(outbox.length&&rounds++<10){const batch=outbox.slice(0,100),r=await api({ops:batch.map(({t,doc})=>({t,doc}))});batch.forEach((x,i)=>{const d=r.results[i];if(x.t==='lead')apply(d);else E.days[d.id]=d;});const ids=new Set(batch.map(x=>x.id));outbox=outbox.filter(x=>!ids.has(x.id));persist();}const r=await api({action:'all'});E.pool=r.pool||[];for(const d of E.pool)addRemoteLead(d);for(const d of r.leads||[])apply(d);for(const d of r.days||[])E.days[d.id]=d;persist();indicator(outbox.length?'sync baaki hai':'sync ho gaya');if(idle())render();}catch(err){indicator(/password/i.test(err.message)?'Password galat hai':'offline');notify(err.message);}finally{busy=false;}}
-function b(a,label,v='',id=''){return `<button class="sm" data-cd="${a}" data-value="${e(v)}" data-id="${e(id)}">${label}</button>`;}
-function show(html){showM(html+`<p>${b('close','Band karo')}</p>`);}
-function close(){closeM();confirmFn=null;mailPlan=null;}
-function confirm(title,html,fn){confirmFn=fn;show(`<h3>${e(title)}</h3>${html}<p>${b('confirm','Haan, confirm karo')}</p>`);}
-function setup(){const c=config();show(`<h3>Device setup</h3><form id="cd-setup"><label>Aapka naam<input name="me" required maxlength="100" value="${e(c.me)}"></label><label>Apps Script Web App URL<input type="url" name="url" value="${e(c.url)}" placeholder="https://script.google.com/macros/s/.../exec"></label><label>Device password<input type="password" name="key" autocomplete="current-password" value="${e(c.key)}"></label><p>URL khaali: localStorage only. Password sirf is device par save hoga, GitHub mein nahi.</p><button class="sm" type="submit">Save aur connect</button></form>`);}
-function setStatus(id,status){if(!Object.hasOwn(statuses,status))throw Error('Status sahi nahi');const o=L(Number(id));if(o.fu&&o.fu.slice(0,10)<=day())o.followedUpOn=day();if(['int','quote','demo','won'].includes(status)){o.next=rev[status];o.res='';}else{o.res=rev[status];o.next='';}o.day=new Date().toDateString();(o.log=o.log||[]).push({id:uid(),type:'status',status,day:day(),at:Date.now(),by:config().me});save();render();}
-function setFu(id,date){if(!validDate(date))throw Error('Follow-up date sahi nahi');L(Number(id)).fu=date?date+'T09:00':'';(L(Number(id)).log=L(Number(id)).log||[]).push({id:uid(),type:'followup',text:date?'Follow-up: '+date:'Follow-up hata diya',day:day(),at:Date.now(),by:config().me});save();render();}
-function product(d){return products.includes(d.product)?d.product:['print','prtL'].includes(d.category)?'CorelDRAW':d.category==='arch'?'Autodesk':'Firewall';}
-function template(cat,p){return E.templates[cat+':'+p]||{subject:'{{product}} follow-up · {{company}}',body:'Namaste {{company}} team,\n\nMain {{me}}, Gen Infosis se. '+(cat==='arch'?'Aapke design projects ke liye ':['print','prtL'].includes(cat)?'Aapke print aur design workflow ke liye ':'Aapki team ki requirement ke liye ')+'{{product}} par hamari baat ka follow-up kar raha/rahi hoon. Users aur requirement share karenge? Main suitable options aur quote bhej sakta/sakti hoon.\n\nBaat karne ka sahi samay kya rahega?\n\nDhanyavaad,\n{{me}}\nGen Infosis'};}
-function fill(t,d){return t.replace(/\{\{(product|company|me)\}\}/g,(_,k)=>({product:product(d),company:d.name,me:config().me}[k]));}
-function editTemplate(){show(`<h3>Mail template badlo</h3><form id="cd-template"><label>Category<select name="category" id="cd-tcat">${Object.entries(cats).map(([k,v])=>`<option value="${k}">${e(v)}</option>`).join('')}</select></label><label>Product<select name="product" id="cd-tprod">${products.map(x=>`<option>${x}</option>`).join('')}</select></label><label>Subject<input name="subject" maxlength="200"></label><label>Body<textarea name="body" maxlength="10000"></textarea></label><p>{{company}}, {{me}}, {{product}} use karo. Edit is device par save hota hai.</p><button class="sm">Template save</button></form>`);loadTemplate();}
-function loadTemplate(){const f=$('#cd-template'),t=template(f.category.value,f.product.value);f.subject.value=t.subject;f.body.value=t.body;}
-async function prepareMails(){await sync();const items=LEADS.map(l=>leadDoc(l.id)).filter(d=>(d.followup===day()||d.followedUpOn===day())&&d.email).map(d=>{const t=template(d.category,product(d));return {leadId:d.id,email:d.email,subject:fill(t.subject,d),body:fill(t.body,d)};});if(!items.length)throw Error('Aaj ke follow-up mein email wale leads nahi hain');if(items.length>100)throw Error('Ek batch mein 100 se kam mail chuno');preview((await api({ops:[{t:'prepare_mail',items}]})).results[0]);}
-function preview(p){mailPlan=p;quota=p.quota;show(`<h3>${p.items.length} leads ko mail jayega. Bhejun?</h3><p>Quota bacha: ${p.quota}. Aaj mailed leads skip hain.</p>${p.items.map(x=>`<section class="box"><b>To: ${e(x.email)}</b><h4>${e(x.subject)}</h4><pre>${e(x.body)}</pre></section>`).join('')}${p.items.length?b('sendmail','Haan, bhejo'):'<p>Aaj sabko mail ho chuka hai.</p>'}`);}
-async function sendMail(){const p=mailPlan;if(!p)return;mailPlan=null;const btn=$('[data-cd="sendmail"]');if(btn)btn.disabled=true;try{const r=(await api({ops:[{t:'mail',token:p.token}]})).results[0];quota=r.quota;show(`<h3>Mail result</h3>${r.results.map(x=>`<p>${e(x.leadId)}: ${x.sent?'Mail bhej diya':x.skipped?'Aaj bhej chuke hain':e(x.error)}</p>`).join('')}<p>Quota bacha: ${quota}</p>`);}catch(err){notify(err.message+' · Automatic retry nahi hoga; Gmail Sent check karo.');close();}}
-async function refreshReplies(){const r=await api({action:'replies'});replies=r.replies;extras=r.extra;quota=r.quota;if(idle()&&!$('#modal').classList.contains('show'))render();}
-function repliesHtml(){return `<div>${b('refreshreplies','Replies refresh')} ${b('extra','+ Aur mail add karo')}</div><p class="sub">Sirf tracked company replies. ${quota==null?'':'Mail quota bacha: '+quota}</p>${extras.map(x=>`<div class="box">${e(x.email)} ${b('removeextra','Address hatao',x.email)}</div>`).join('')}${replies.map(r=>`<section class="box cd-reply"><h3>${e(r.leadName)} ${r.unread&&!r.done?'<span class="tag">Naya reply</span>':''} ${r.done?' · Done':''}</h3><p>${e(r.sender)} · ${e(new Date(r.date).toLocaleString('en-IN',{timeZone:'Asia/Kolkata'}))}</p><b>${e(r.subject)}</b><p>${e(r.snippet)}</p><details><summary>Poora reply</summary><pre>${e(r.text)}</pre></details><p>${r.leadId?b('openlead','Lead kholo',r.leadId):''} ${b('draftreply','Jawab likho',r.id)} ${b('done','Mark as done',r.id)} ${r.leadId?b('linkreply','Interested + follow-up',r.id):''}</p></section>`).join('')||'<p>Abhi company replies nahi hain.</p>'}`;}
-function replyDraft(id){const r=replies.find(x=>x.id===id);if(!r)throw Error('Reply nahi mila');show(`<h3>Jawab · ${e(r.leadName)}</h3><p>To: ${e(r.email)}</p><form id="cd-reply"><input name="replyId" type="hidden" value="${e(id)}"><label>Jawab<textarea name="body" maxlength="10000" required>Namaste,\n\nReply ke liye dhanyavaad. Requirement par baat karne ka sahi samay kya rahega?\n\n${e(config().me)}\nGen Infosis</textarea></label><button class="sm">Preview dekho</button></form>`);}
-function openLead(id){let l=LEADS.find(x=>cloudId(x.id)===String(id));if(!l)throw Error('Lead is device par nahi mila');openId=cloudId(l.id);tab='sab';cat='Sab';area='Sab shehar';prod='Sab products';q=l.n;efilter=null;render();scrollTo(0,0);}
-function stats(range='today'){const log=LEADS.flatMap(l=>L(l.id).log||[]).filter(x=>x.type==='status'&&(range==='all'||x.day===day()));return {calls:log.length,leads:LEADS.length,interested:LEADS.filter(l=>L(l.id).next==='interest').length,followups:LEADS.filter(l=>(L(l.id).fu||'').slice(0,10)===day()).length};}
-const tools=new Set(['list_leads','set_status','set_followup','add_note','prepare_followup_mails','show_replies','draft_reply','get_stats','open_tab']);
-function validate(c){if(!c||!tools.has(c.name)||!c.args||typeof c.args!=='object'||Array.isArray(c.args))throw Error('Tool allowed nahi hai');const a=c.args;if(['set_status','set_followup','add_note'].includes(c.name)&&!LEADS.some(l=>cloudId(l.id)===String(a.leadId)))throw Error('Lead ID sahi nahi');if(c.name==='set_status'&&!Object.hasOwn(statuses,a.status))throw Error('Status sahi nahi');if(c.name==='set_followup'&&(typeof a.date!=='string'||!validDate(a.date)))throw Error('Date sahi nahi');if(c.name==='add_note'&&(typeof a.text!=='string'||a.text.length>5000))throw Error('Note sahi nahi');if(c.name==='open_tab'&&!Object.hasOwn(tabNames,a.name))throw Error('Tab sahi nahi');if(c.name==='list_leads'){for(const k of Object.keys(a.filter||{}))if(!['city','category','status'].includes(k))throw Error('Filter sahi nahi');}}
-async function run(c){const a=c.args,id=LEADS.find(l=>cloudId(l.id)===String(a.leadId))?.id;switch(c.name){case 'list_leads':efilter=a.filter||{};q='';cat='Sab';area='Sab shehar';prod='Sab products';tab='sab';render();break;case 'set_status':setStatus(id,a.status);break;case 'set_followup':setFu(id,a.date);break;case 'add_note':{const o=L(id);o.note=[o.note,a.text].filter(Boolean).join('\n');(o.log=o.log||[]).push({id:uid(),type:'note',text:a.text,day:day(),at:Date.now(),by:config().me});save();render();break;}case 'prepare_followup_mails':await prepareMails();break;case 'show_replies':tab='replies';await refreshReplies();render();break;case 'draft_reply':await refreshReplies();replyDraft(a.replyId);break;case 'get_stats':chat.push({role:'model',text:JSON.stringify(stats(a.range))});tab='madad';render();break;case 'open_tab':tab=a.name;efilter=null;render();break;}}
-async function handleTools(calls){if(!Array.isArray(calls)||calls.length>20)throw Error('Bahut tool calls');calls.forEach(validate);const writes=calls.filter(c=>['set_status','set_followup','add_note'].includes(c.name)),other=calls.filter(c=>!writes.includes(c));if(writes.length)confirm(`${new Set(writes.map(c=>c.args.leadId)).size} leads mein badlav. Confirm karo`,writes.map(c=>`<pre>${e(c.name)}: ${e(JSON.stringify(c.args))}</pre>`).join(''),async()=>{for(const c of writes)await run(c);for(const c of other)await run(c);});else for(const c of other)await run(c);}
-function chatHtml(){return `<section class="box"><h3>Madad · Gemini</h3><p class="sub">Hinglish mein bolo: “Pune ke CA leads dikha”, “aaj kitni calls hui”, “replies dikha”. Har lead change pe confirmation hoga.</p><div id="cd-chatlog">${chat.map((m,i)=>`<section class="box"><b>${m.role==='user'?'Aap':'Madad'}</b><pre>${e(m.text)}</pre>${m.role==='model'?b('copyanswer','Copy',i):''}</section>`).join('')}</div><form id="cd-chat"><label>Aapka sawaal<textarea name="message" maxlength="2000" required></textarea></label><button class="sm">Bhejo</button></form></section>`;}
-async function ask(text){if(!text||text.length>2000)throw Error('Sawaal 2000 characters tak rakho');chat.push({role:'user',text});tab='madad';render();const r=(await api({ops:[{t:'chat',messages:chat.slice(-12),context:{openLeadId:openId,tab}}]})).results[0];chat.push({role:'model',text:r.text||'Command samajh aa gaya; action / preview dekho.'});render();await handleTools(r.calls||[]);}
-function sheetCsv(data){const cols=['id','name','category','city','phone','email','status','followup','note','source','website','addedAt','log'];return '\ufeff'+[cols,...data.map(d=>cols.map(k=>k==='log'?JSON.stringify(d.log||[]):d[k]||''))].map(row=>row.map(v=>{let s=String(v);if(/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}).join(',')).join('\r\n');}
-// Bridge into original functions; all original renderers and export functions remain.
-const baseRender=render,baseFiltered=filtered,baseExtra=extraRow,baseCard=card,baseSetOpt=setOpt;
-filtered=function(){let list=baseFiltered();if(efilter)list=list.filter(l=>{const d=leadDoc(l.id);return (!efilter.city||d.city===efilter.city)&&(!efilter.category||d.category===efilter.category)&&(!efilter.status||d.status===efilter.status);});return list;};
-setOpt=function(id,key,value){const o=L(id),nextValue=o[key]===value?'':value;const status=key==='next'?(fwd[nextValue]||fwd[o.res]||''):(fwd[o.next]||fwd[nextValue]||'');if(o.fu&&o.fu.slice(0,10)<=day())o.followedUpOn=day();(o.log=o.log||[]).push({id:uid(),type:'status',status,day:day(),at:Date.now(),by:config().me});baseSetOpt(id,key,value);};
-extraRow=function(l){return baseExtra(l)+`<div class="cd-row"><span class="sub">Quick snooze</span> ${b('snooze','kal',1,l.id)} ${b('snooze','3 din',3,l.id)} ${b('snooze','1 hafta',7,l.id)} ${b('clearfu','Follow-up hatao','',l.id)}</div><label class="sub">Follow-up mail product <select data-cd-field="mailProduct" data-id="${l.id}"><option value="">Auto chuno</option>${products.map(p=>`<option ${L(l.id).mailProduct===p?'selected':''}>${p}</option>`).join('')}</select></label>`;};
-card=function(l){const d=leadDoc(l.id);const extra=`<div class="cd-row">${d.addedAt?'<span class="tag">Auto-add: '+e(new Date(d.addedAt).toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short'}))+'</span>':''}${/^https?:\/\//i.test(d.website)?`<a class="sm" href="${e(d.website)}" target="_blank" rel="noopener">Website / email dekho</a>`:''} ${b('leadchat','Madad lo',d.id)}</div><details><summary class="sub">Call log (${d.log.length})</summary>${d.log.slice().reverse().map(x=>`<p>${e(new Date(x.at).toLocaleString('en-IN',{timeZone:'Asia/Kolkata'}))} · ${e(x.by)} · ${e(statuses[x.status]||x.text||x.type)}</p>`).join('')||'<p>Abhi log nahi hai.</p>'}</details>`;return baseCard(l).replace('</section>',extra+'</section>');};
-render=function(){today=new Date().toDateString();freeze();const special=['replies','madad'].includes(tab),actual=tab;if(special)tab='aaj';baseRender();document.querySelector('#done').textContent=stats().calls;tab=actual;$('#tabs').insertAdjacentHTML('beforeend',b('tab','Replies'+(replies.filter(x=>x.unread&&!x.done).length?' ('+replies.filter(x=>x.unread&&!x.done).length+')':''),'replies')+' '+b('tab','Madad','madad'));if(special){$('#tabs .on')?.classList.remove('on');$(`#tabs [data-value="${tab}"]`)?.classList.add('on');$('#view').innerHTML=tab==='replies'?repliesHtml():chatHtml();}if(tab==='fu')$('#view').insertAdjacentHTML('afterbegin',`<div class="box">${b('preparemail','Aaj ke follow-up ko mail bhejo')} <p class="sub">Aaj ki date ya aaj kiya follow-up + email wale leads. Preview ke baad hi bhejenge. ${quota==null?'':'Quota bacha: '+quota}</p></div>`);if(tab==='prod')$('#view').insertAdjacentHTML('afterbegin',`<div class="box"><b>CorelDRAW</b><p>Print aur design workflow, users aur renewal samjho. Current licence options verify karke quote do.</p>${b('template','Mail template badlo')}</div>`);if(tab==='rep')$('#view').insertAdjacentHTML('afterbegin',`<div class="box"><b>Cloud, mail aur backup</b><p>Outbox: ${outbox.length} pending. ${quota==null?'':'Mail quota bacha: '+quota}</p>${b('export','Sheet se data export (CSV)')} ${b('setup','Device setup')} ${b('sync','Abhi sync karo')} ${b('template','Mail template badlo')}</div>`);};
-// Route legacy connection buttons to the new authenticated backend, not the old protocol.
-gsInit=async function(manual){if(!config().url||!config().key){if(manual)setup();return;}await sync();};gsPull=sync;cloudPush=()=>{changed();};
-AI=async text=>{const r=(await api({ops:[{t:'chat',messages:[{role:'user',text:String(text).slice(0,2000)}],context:{openLeadId:openId,tab}}]})).results[0];return {text:r.text||'Madad tab mein poochho.'};};
-function migrate(){for(const l of LEADS){l.category=category(l);const o=L(l.id);if((o.res||o.next)&&!(o.log||[]).length)o.log=[{id:'legacy-'+l.id,type:'status',status:fwd[o.next]||fwd[o.res]||'',at:Number(o.lt)||Date.now(),day:o.day?day(new Date(o.day)):'',by:S.me||S.name||''}];cache.set(l.id,fingerprint(o));if(Object.keys(o).length){const d=leadDoc(l.id);if(!E.leads[d.id]){E.leads[d.id]=d;queue('lead',d);}}}for(const d of E.pool)addRemoteLead(d);for(const d of Object.values(E.leads))apply(d);if(!localStorage.getItem('cd.me'))localStorage.setItem('cd.me',S.me||S.name||'');persist();}
-async function action(a,v,id){switch(a){case 'tab':tab=v;efilter=null;render();if(v==='replies'&&config().url&&config().key)await refreshReplies();break;case 'setup':setup();break;case 'sync':await sync();break;case 'theme':document.documentElement.dataset.theme=document.documentElement.dataset.theme==='light'?'dark':'light';localStorage.setItem('cd.theme',document.documentElement.dataset.theme);break;case 'close':close();break;case 'snooze':setFu(id,plus(v));break;case 'clearfu':setFu(id,'');break;case 'template':editTemplate();break;case 'preparemail':await prepareMails();break;case 'sendmail':await sendMail();break;case 'refreshreplies':await refreshReplies();break;case 'openlead':openLead(v);break;case 'draftreply':replyDraft(v);break;case 'done':await api({ops:[{t:'done',replyId:v}]});await refreshReplies();break;case 'leadchat':openId=v;tab='madad';render();$('#cd-chat textarea').value='Lead '+v+' ke liye '+product(leadDoc(localId(v)))+' ka short calling script do';break;case 'linkreply':{const r=replies.find(x=>x.id===v);confirm('Interested + follow-up set karna hai?',`<p>${e(r.leadName)}</p><label>Follow-up date<input id="cd-linkdate" type="date" value="${plus(1)}"></label>`,()=>{const date=$('#cd-linkdate').value;if(!validDate(date)||!date)throw Error('Date daalo');setStatus(localId(r.leadId),'int');setFu(localId(r.leadId),date);});break;}case 'extra':show(`<h3>Aur email track karo</h3><form id="cd-extra"><label>Email<input type="email" name="email" required></label><label>Company naam (optional)<input name="company" maxlength="160"></label><label>Lead (optional)<select name="leadId"><option value="">Lead chuno</option>${LEADS.map(l=>`<option value="${e(cloudId(l.id))}">${e(l.n)}</option>`).join('')}</select></label><p>Sirf is address ko bheje mail ke company replies dikhaye jayenge.</p><button class="sm">Address add karo</button></form>`);break;case 'removeextra':confirm('Address tracking hatao?',`<p>${e(v)}</p>`,async()=>{await api({ops:[{t:'extra_remove',email:v}]});await refreshReplies();});break;case 'copyanswer':await navigator.clipboard.writeText(chat[Number(v)].text);notify('Copy ho gaya');break;case 'confirm':{const fn=confirmFn;confirmFn=null;const btn=$('[data-cd="confirm"]');if(btn)btn.disabled=true;if(fn)await fn();if(!confirmFn&&!mailPlan)closeM();break;}case 'export':{await sync();const r=await api({action:'export'}),map=new Map(LEADS.map(l=>[cloudId(l.id),leadDoc(l.id)]));for(const d of [...r.pool,...r.leads])map.set(String(d.id),{...map.get(String(d.id)),...d});saveFile('callingdesk-sheet.csv',sheetCsv([...map.values()]),'text/csv');break;}}}
-document.addEventListener('click',async ev=>{const btn=ev.target.closest('[data-cd]');if(!btn)return;try{await action(btn.dataset.cd,btn.dataset.value,btn.dataset.id);}catch(err){notify(err.message);}});
-document.addEventListener('change',ev=>{const x=ev.target;try{if(x.dataset.cdField){L(Number(x.dataset.id))[x.dataset.cdField]=x.value;save();}if(['cd-tcat','cd-tprod'].includes(x.id))loadTemplate();}catch(err){notify(err.message);}});
-document.addEventListener('submit',async ev=>{const f=ev.target;if(!f.id.startsWith('cd-'))return;ev.preventDefault();try{if(f.id==='cd-setup'){const u=f.url.value.trim();if(u&&!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u))throw Error('Apps Script ka /exec URL daalo');if(u&&!f.key.value)throw Error('Password daalo');S.name=f.me.value.trim();S.me=S.name;S.cloud=u;S.pin='';localStorage.setItem('cd.me',S.name);localStorage.setItem('cd.url',u);localStorage.setItem('cd.key',f.key.value);catalogSent=false;persist();close();await sync();render();}if(f.id==='cd-template'){E.templates[f.category.value+':'+f.product.value]={subject:f.subject.value,body:f.body.value};persist();close();}if(f.id==='cd-extra'){await api({ops:[{t:'extra_add',email:f.email.value,name:f.company.value,leadId:f.leadId.value}]});close();await refreshReplies();}if(f.id==='cd-reply')preview((await api({ops:[{t:'prepare_mail',replyId:f.replyId.value,body:f.body.value}]})).results[0]);if(f.id==='cd-chat'){const text=f.message.value.trim();f.querySelector('button').disabled=true;await ask(text);}}catch(err){notify(err.message);const btn=f.querySelector('button');if(btn)btn.disabled=false;}});
-document.querySelector('header').insertAdjacentHTML('afterend',`<div class="cd-toolbar">${b('theme','Light / dark')} ${b('setup','Device setup')} <span class="sub" role="status" id="cd-sync">Sirf is device par</span></div>`);document.body.insertAdjacentHTML('beforeend',`<button class="cd-float" data-cd="tab" data-value="madad">💬 Madad</button>`);
-window.CD={changed,sync,setup,api,day,plus,doc:leadDoc,setStatus,setFollowup:setFu,handleTools,refreshReplies,stats,get state(){return E;},get outbox(){return outbox;},get replies(){return replies;},get chat(){return chat;},get busy(){return busy;},localId,cloudId};
-document.documentElement.dataset.theme=localStorage.getItem('cd.theme')||'dark';migrate();render();sync();setInterval(()=>{freeze();sync();},20000);setInterval(()=>{if(config().url&&config().key&&!document.hidden)refreshReplies().catch(err=>notify(err.message));},180000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync();});window.addEventListener('online',sync);window.addEventListener('offline',()=>indicator('offline'));
-})();
-
 </script>
 </body>
 </html>
