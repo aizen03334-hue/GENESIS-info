@@ -1,80 +1,464 @@
 <!DOCTYPE html>
 <html lang="hi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Daily Calling Desk – Genesis Infoserve</title>
-<style>
-:root{--bg:#0d1514;--card:#131d1c;--line:#24332f;--tx:#e8f0ee;--mu:#8da39e;--teal:#5fd4c0;--green:#52d68a;--amber:#e8b04a;--red:#f0705f;--blue:#6aa5ff;color-scheme:dark}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 "Segoe UI",system-ui,sans-serif;padding:16px;max-width:760px;margin-inline:auto}
-button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer}
-:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
-header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
-h1{margin:0;font-size:20px}
-.date{color:var(--mu);font-size:12px}
-.cnt{text-align:right;flex:1;max-width:260px}
-.cnt b{font-size:13px}.cnt small{color:var(--mu);float:right}
-.bar{height:6px;background:#1c2a28;border-radius:9px;margin-top:6px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--teal);width:0;transition:width .3s}
-nav{display:flex;gap:4px;margin:16px 0 12px;overflow-x:auto}
-nav button{background:none;border:0;border-radius:99px;padding:8px 16px;color:var(--mu);white-space:nowrap}
-nav button.on{background:var(--tx);color:#10201d;font-weight:600}
-nav .n{background:#233430;border-radius:99px;padding:1px 7px;font-size:11px;margin-left:4px}
-.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-.chip{border:1px solid var(--line);background:#0f1a18;border-radius:99px;padding:6px 14px;font-weight:600;font-size:12px}
-.chip.on{background:var(--teal);color:#06231d;border-color:var(--teal)}
-select,input[type=text]{background:#0f1a18;border:1px solid var(--line);border-radius:8px;padding:7px 10px}
-.me{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--mu);font-size:12px}
-.me input{width:130px}
-.lead{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
-.top{display:flex;justify-content:space-between;gap:8px}
-.lead h2{margin:0;font-size:15px;letter-spacing:.2px}
-.sub{color:var(--mu);font-size:12px;margin-top:3px}
-.tag{background:#14403a;color:var(--teal);border-radius:5px;padding:1px 7px;font-size:11px;font-weight:600;margin-left:4px}
-.st{background:#243230;border-radius:99px;padding:3px 10px;font-size:11px;height:fit-content;white-space:nowrap}
-.phone{display:flex;gap:8px;align-items:center;margin:12px 0;flex-wrap:wrap}
-.num{background:#0f3a35;border-radius:8px;padding:10px 14px;font:600 17px ui-monospace,Consolas,monospace;color:var(--tx);text-decoration:none;letter-spacing:1px}
-.sm{background:#0f1a18;border:1px solid var(--line);border-radius:7px;padding:7px 11px;font-size:12px;font-weight:600}
-.sm.wa{color:var(--green);border-color:var(--green)}
-.lbl{color:var(--mu);font-size:11px;font-weight:700;letter-spacing:.8px;margin:12px 0 6px}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
-.o{background:transparent;border:1px solid;border-radius:9px;padding:12px 6px;font-weight:600;font-size:13px}
-.o.on{background:currentColor}.o.on span{color:#0d1514}
-.c-g{color:#a9b8b4;border-color:#3b4a46}.c-a{color:var(--amber);border-color:#7a5a1e;background:#2a2112}
-.c-r{color:var(--red);border-color:#7a2f27;background:#2b1513}.c-r2{color:var(--red);border-color:#8a3a30;background:#3a1a16}
-.n-g{color:var(--green);border-color:#2f8a5b;background:#10261d}.n-b{color:var(--blue);border-color:#2f4f8a;background:#121d33}
-.o.on{filter:brightness(1.0);outline:2px solid currentColor;outline-offset:1px}
-.o.on span{color:inherit}
-textarea{width:100%;min-height:62px;background:#0f1a18;border:1px solid var(--line);border-radius:9px;padding:10px;resize:vertical;margin-top:12px}
-.em{width:100%;margin-bottom:4px}
-.src{text-align:right;color:var(--mu);font-size:11px;margin-top:8px}.src a{color:var(--blue)}
-.empty,.box{color:var(--mu);text-align:center;padding:30px 12px;border:1px dashed var(--line);border-radius:12px}
-.box{text-align:left;color:var(--tx);background:var(--card);border-style:solid;margin-bottom:12px;padding:16px}
-.modal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:16px}
-.modal.show{display:flex}
-.modal div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;max-width:480px;max-height:85vh;overflow:auto}
-.modal p{margin:8px 0}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-.stats div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
-.stats b{font-size:24px;display:block}
-.bk{margin-left:auto;background:var(--teal);color:#06231d!important;font-weight:700;border:0;border-radius:99px;padding:8px 16px;white-space:nowrap}
-@media(max-width:520px){.me{margin-left:0;width:100%}}
-</style>
-</head>
-<body>
-<header>
-  <div><h1>Daily Calling Desk</h1><div class="date" id="date"></div><div class="date" id="tot" style="color:var(--teal);font-weight:600;margin-top:2px"></div></div>
-  <div class="cnt"><b><span id="done">0</span> calls aaj</b><small>target <span id="tgt">40</span></small><div class="bar"><i id="fill"></i></div></div>
-</header>
-<nav id="tabs"></nav>
-<div id="gs" style="padding:8px 14px 0"><input type="search" id="gq" placeholder="🔍 Sab leads mein search: naam, phone, area, email, note..." oninput="gSearch(this.value)" autocomplete="off" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line,#2a3a37);background:var(--card,#101a19);color:inherit;font-size:15px"><div id="gres"></div></div>
-<div id="view"></div>
-<div class="modal" id="modal"><div id="mbody"></div></div>
 
-<script>
-const LEADS=[
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Daily Calling Desk – Genesis Infoserve</title>
+    <style>
+        :root {
+            --bg: #0d1514;
+            --card: #131d1c;
+            --line: #24332f;
+            --tx: #e8f0ee;
+            --mu: #8da39e;
+            --teal: #5fd4c0;
+            --green: #52d68a;
+            --amber: #e8b04a;
+            --red: #f0705f;
+            --blue: #6aa5ff;
+            color-scheme: dark
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--tx);
+            font: 14px/1.4 "Segoe UI", system-ui, sans-serif;
+            padding: 16px;
+            max-width: 760px;
+            margin-inline: auto
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+            color: inherit
+        }
+
+        button {
+            cursor: pointer
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--teal);
+            outline-offset: 2px
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 12px
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 20px
+        }
+
+        .date {
+            color: var(--mu);
+            font-size: 12px
+        }
+
+        .cnt {
+            text-align: right;
+            flex: 1;
+            max-width: 260px
+        }
+
+        .cnt b {
+            font-size: 13px
+        }
+
+        .cnt small {
+            color: var(--mu);
+            float: right
+        }
+
+        .bar {
+            height: 6px;
+            background: #1c2a28;
+            border-radius: 9px;
+            margin-top: 6px;
+            overflow: hidden
+        }
+
+        .bar i {
+            display: block;
+            height: 100%;
+            background: var(--teal);
+            width: 0;
+            transition: width .3s
+        }
+
+        nav {
+            display: flex;
+            gap: 4px;
+            margin: 16px 0 12px;
+            overflow-x: auto
+        }
+
+        nav button {
+            background: none;
+            border: 0;
+            border-radius: 99px;
+            padding: 8px 16px;
+            color: var(--mu);
+            white-space: nowrap
+        }
+
+        nav button.on {
+            background: var(--tx);
+            color: #10201d;
+            font-weight: 600
+        }
+
+        nav .n {
+            background: #233430;
+            border-radius: 99px;
+            padding: 1px 7px;
+            font-size: 11px;
+            margin-left: 4px
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 14px
+        }
+
+        .chip {
+            border: 1px solid var(--line);
+            background: #0f1a18;
+            border-radius: 99px;
+            padding: 6px 14px;
+            font-weight: 600;
+            font-size: 12px
+        }
+
+        .chip.on {
+            background: var(--teal);
+            color: #06231d;
+            border-color: var(--teal)
+        }
+
+        select,
+        input[type=text] {
+            background: #0f1a18;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 7px 10px
+        }
+
+        .me {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--mu);
+            font-size: 12px
+        }
+
+        .me input {
+            width: 130px
+        }
+
+        .lead {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px
+        }
+
+        .lead h2 {
+            margin: 0;
+            font-size: 15px;
+            letter-spacing: .2px
+        }
+
+        .sub {
+            color: var(--mu);
+            font-size: 12px;
+            margin-top: 3px
+        }
+
+        .tag {
+            background: #14403a;
+            color: var(--teal);
+            border-radius: 5px;
+            padding: 1px 7px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 4px
+        }
+
+        .st {
+            background: #243230;
+            border-radius: 99px;
+            padding: 3px 10px;
+            font-size: 11px;
+            height: fit-content;
+            white-space: nowrap
+        }
+
+        .phone {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin: 12px 0;
+            flex-wrap: wrap
+        }
+
+        .num {
+            background: #0f3a35;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font: 600 17px ui-monospace, Consolas, monospace;
+            color: var(--tx);
+            text-decoration: none;
+            letter-spacing: 1px
+        }
+
+        .sm {
+            background: #0f1a18;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            padding: 7px 11px;
+            font-size: 12px;
+            font-weight: 600
+        }
+
+        .sm.wa {
+            color: var(--green);
+            border-color: var(--green)
+        }
+
+        .lbl {
+            color: var(--mu);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            margin: 12px 0 6px
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px
+        }
+
+        .o {
+            background: transparent;
+            border: 1px solid;
+            border-radius: 9px;
+            padding: 12px 6px;
+            font-weight: 600;
+            font-size: 13px
+        }
+
+        .o.on {
+            background: currentColor
+        }
+
+        .o.on span {
+            color: #0d1514
+        }
+
+        .c-g {
+            color: #a9b8b4;
+            border-color: #3b4a46
+        }
+
+        .c-a {
+            color: var(--amber);
+            border-color: #7a5a1e;
+            background: #2a2112
+        }
+
+        .c-r {
+            color: var(--red);
+            border-color: #7a2f27;
+            background: #2b1513
+        }
+
+        .c-r2 {
+            color: var(--red);
+            border-color: #8a3a30;
+            background: #3a1a16
+        }
+
+        .n-g {
+            color: var(--green);
+            border-color: #2f8a5b;
+            background: #10261d
+        }
+
+        .n-b {
+            color: var(--blue);
+            border-color: #2f4f8a;
+            background: #121d33
+        }
+
+        .o.on {
+            filter: brightness(1.0);
+            outline: 2px solid currentColor;
+            outline-offset: 1px
+        }
+
+        .o.on span {
+            color: inherit
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 62px;
+            background: #0f1a18;
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            padding: 10px;
+            resize: vertical;
+            margin-top: 12px
+        }
+
+        .em {
+            width: 100%;
+            margin-bottom: 4px
+        }
+
+        .src {
+            text-align: right;
+            color: var(--mu);
+            font-size: 11px;
+            margin-top: 8px
+        }
+
+        .src a {
+            color: var(--blue)
+        }
+
+        .empty,
+        .box {
+            color: var(--mu);
+            text-align: center;
+            padding: 30px 12px;
+            border: 1px dashed var(--line);
+            border-radius: 12px
+        }
+
+        .box {
+            text-align: left;
+            color: var(--tx);
+            background: var(--card);
+            border-style: solid;
+            margin-bottom: 12px;
+            padding: 16px
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: #000a;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px
+        }
+
+        .modal.show {
+            display: flex
+        }
+
+        .modal div {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 480px;
+            max-height: 85vh;
+            overflow: auto
+        }
+
+        .modal p {
+            margin: 8px 0
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px
+        }
+
+        .stats div {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 14px
+        }
+
+        .stats b {
+            font-size: 24px;
+            display: block
+        }
+
+        .bk {
+            margin-left: auto;
+            background: var(--teal);
+            color: #06231d !important;
+            font-weight: 700;
+            border: 0;
+            border-radius: 99px;
+            padding: 8px 16px;
+            white-space: nowrap
+        }
+
+        @media(max-width:520px) {
+            .me {
+                margin-left: 0;
+                width: 100%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>Daily Calling Desk</h1>
+            <div class="date" id="date"></div>
+            <div class="date" id="tot" style="color:var(--teal);font-weight:600;margin-top:2px"></div>
+        </div>
+        <div class="cnt"><b><span id="done">0</span> calls aaj</b><small>target <span id="tgt">40</span></small>
+            <div class="bar"><i id="fill"></i></div>
+        </div>
+    </header>
+    <nav id="tabs"></nav>
+    <div id="gs" style="padding:8px 14px 0"><input type="search" id="gq" placeholder="🔍 Sab leads mein search: naam, phone, area, email, note..." oninput="gSearch(this.value)" autocomplete="off" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line,#2a3a37);background:var(--card,#101a19);color:inherit;font-size:15px">
+        <div id="gres"></div>
+    </div>
+    <div id="view"></div>
+    <div class="modal" id="modal">
+        <div id="mbody"></div>
+    </div>
+
+    <script>
+        const LEADS=[
 {id:1,n:"SSA Architects",a:"Prabhadevi",t:"Architect",p:"+91 22 6629 6500",c:"Design software"},
 {id:2,n:"Sanjay Puri Architects",a:"Worli",t:"Architect",p:"+91 22 2496 5840",c:"Design software"},
 {id:3,n:"Collaborative Architecture",a:"Parel",t:"Architect",p:"+91 99670 33533",c:"Design software"},
@@ -662,6 +1046,858 @@ $("#view").innerHTML=h;
 }
 $("#date").textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"});
 render();
-</script>
+    </script>
+    <!-- MERA DESK PERSONAL AI: SINGLE FILE ADD-ON -->
+    <style>
+        #mdOpen {
+            position: fixed;
+            right: 16px;
+            bottom: 87px;
+            z-index: 9998;
+            background: #66dcc3;
+            color: #08231e;
+            border: 0;
+            padding: 12px 16px;
+            border-radius: 22px;
+            font-weight: 800;
+            box-shadow: 0 5px 25px #0008;
+            cursor: pointer
+        }
+
+        #mdApp {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #0d1719;
+            color: #e9f5f1;
+            font-family: system-ui, Arial, sans-serif;
+            font-size: 14px
+        }
+
+        #mdApp.visible {
+            display: flex
+        }
+
+        #mdApp * {
+            box-sizing: border-box
+        }
+
+        #mdSidebar {
+            width: 230px;
+            background: #102023;
+            border-right: 1px solid #2c4648;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .mdBtn {
+            background: #203538;
+            color: #e9f5f1;
+            border: 1px solid #3a5255;
+            padding: 9px 12px;
+            border-radius: 10px;
+            cursor: pointer
+        }
+
+        .mdBtn:hover {
+            background: #345254
+        }
+
+        #mdMain {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column
+        }
+
+        #mdHead {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid #345052;
+            gap: 8px
+        }
+
+        #mdMessages {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px max(14px, calc((100% - 800px)/2))
+        }
+
+        .mdBubble {
+            padding: 13px 16px;
+            border-radius: 14px;
+            max-width: 85%;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            line-height: 1.6;
+            background: #1c3033;
+            border: 1px solid #395154
+        }
+
+        .mdBubble.user {
+            align-self: flex-end;
+            background: #236156
+        }
+
+        .mdBubble.bot {
+            align-self: flex-start
+        }
+
+        #mdForm {
+            padding: 12px;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid #345052;
+            align-items: end
+        }
+
+        #mdInput {
+            flex: 1;
+            min-width: 0;
+            height: 56px;
+            max-height: 140px;
+            resize: vertical;
+            background: #1b3032;
+            color: white;
+            border: 1px solid #416162;
+            border-radius: 10px;
+            padding: 10px
+        }
+
+        #mdSend {
+            background: #6bdec7;
+            border: 0;
+            color: #05251c;
+            font-weight: 700;
+            padding: 15px;
+            border-radius: 10px
+        }
+
+        #mdStatus {
+            font-size: 12px;
+            color: #91b4b0;
+            padding: 2px 14px
+        }
+
+        #mdList {
+            overflow: auto;
+            flex: 1
+        }
+
+        .mdHistory {
+            padding: 9px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            background: #203538;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        #mdDialog {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: #0e1d20;
+            z-index: 5;
+            overflow: auto;
+            padding: 30px 15px
+        }
+
+        #mdDialog.on {
+            display: block
+        }
+
+        #mdDialogInner {
+            max-width: 650px;
+            margin: auto
+        }
+
+        .mdField {
+            display: block;
+            width: 100%;
+            padding: 11px;
+            background: #162c30;
+            color: #fff;
+            border: 1px solid #395357;
+            border-radius: 8px;
+            margin: 6px 0 15px
+        }
+
+        .mdEntry {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px;
+            border-bottom: 1px solid #35484b
+        }
+
+        .mdEntry span {
+            flex: 1
+        }
+
+        @media(max-width:600px) {
+            #mdSidebar {
+                width: 65px;
+                padding: 8px;
+                gap: 6px
+            }
+
+            #mdSidebar .mdLabel,
+            #mdList {
+                display: none
+            }
+
+            #mdSidebar .mdBtn {
+                font-size: 11px;
+                padding: 8px 2px
+            }
+
+            #mdMessages {
+                padding: 12px
+            }
+
+            .mdBubble {
+                max-width: 94%
+            }
+
+            #mdHead {
+                padding: 10px
+            }
+
+            #mdOpen {
+                bottom: 85px
+            }
+        }
+    </style>
+    <button id="mdOpen" type="button">✦ Mera Desk AI</button>
+    <section id="mdApp" aria-label="Mera Desk AI">
+        <aside id="mdSidebar">
+            <b style="color:#68dec6">✦ <span class="mdLabel">Mera Desk</span></b><button class="mdBtn" id="mdNew">＋ <span class="mdLabel">New chat</span></button><button class="mdBtn" id="mdTasks">☑ <span class="mdLabel">Tasks</span></button><button class="mdBtn" id="mdMemory">🧠 <span class="mdLabel">Memory</span></button><button class="mdBtn" id="mdSettings">⚙ <span class="mdLabel">Settings</span></button><small class="mdLabel">Chats</small>
+            <div id="mdList"></div><button class="mdBtn" id="mdBackup">↓ <span class="mdLabel">Backup</span></button>
+        </aside>
+        <div id="mdMain">
+            <header id="mdHead">
+                <div><strong id="mdName">Mera Desk AI</strong>
+                    <div style="font-size:11px;color:#95b9b5">Cloudflare Workers AI</div>
+                </div><button class="mdBtn" id="mdClose">✕ Calling Desk</button>
+            </header>
+            <div id="mdMessages"></div>
+            <div id="mdStatus">Ready</div>
+            <form id="mdForm">
+                <textarea id="mdInput" placeholder="Hinglish ya English mein poochho…" required></textarea><button id="mdSend" type="submit">Send ➤</button>
+            </form>
+        </div>
+        <div id="mdDialog">
+            <div id="mdDialogInner"><button type="button" class="mdBtn" id="mdBack">← Back</button>
+                <div id="mdDialogBody"></div>
+            </div>
+        </div>
+    </section>
+    <script>
+        (()=>{'use strict';
+const API='https://deskai.mohnish00027.workers.dev';const KEY='genesis_personal_assistant_clean_v1';const el=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fresh=()=>({name:'',assistant:'Mera Desk AI',style:'friendly Hinglish',custom:'',memories:[],tasks:[],chats:[],active:''});let state;try{state={...fresh(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{state=fresh()}if(!Array.isArray(state.chats))state.chats=[];if(!Array.isArray(state.tasks))state.tasks=[];if(!Array.isArray(state.memories))state.memories=[];
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){console.warn('Personal assistant data not saved',e)}};const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);const chat=()=>state.chats.find(c=>c.id===state.active);
+function addChat(){let c={id:id(),title:'New chat',messages:[]};state.chats.unshift(c);state.active=c.id;save();render()};function ensure(){if(!chat())addChat()};function bubble(role,text){let div=document.createElement('div');div.className='mdBubble '+(role==='user'?'user':'bot');div.textContent=text;el('mdMessages').append(div);el('mdMessages').scrollTop=el('mdMessages').scrollHeight;return div}
+function render(){el('mdName').textContent=state.assistant;el('mdList').replaceChildren();for(const c of state.chats.slice(0,40)){let b=document.createElement('div');b.className='mdHistory';b.textContent=c.title;b.onclick=()=>{state.active=c.id;save();render()};el('mdList').append(b)}el('mdMessages').replaceChildren();let c=chat();if(!c||!c.messages.length)bubble('bot','Namaste! Main tumhara Mera Desk Personal Assistant hoon. Hinglish mein baat karo. Tasks, memory aur leads search bhi kar sakte ho.');if(c)for(const m of c.messages)bubble(m.role,m.text)}
+function local(t){let m=t.match(/^(?:yaad rakho|remember(?: that)?)\s*[:,-]?\s*(.+)$/i);if(m){state.memories.push({id:id(),text:m[1]});save();return'🧠 Yaad rakh liya.'}m=t.match(/^(?:task add|add task)\s*[:,-]?\s*(.+)$/i);if(m){state.tasks.push({id:id(),text:m[1],done:false});save();return'✅ Task add ho gaya: '+m[1]}if(/^(?:my tasks|pending tasks|meri tasks)$/i.test(t)){let a=state.tasks.filter(x=>!x.done);return a.length?a.map((x,i)=>`${i+1}. ${x.text}`).join('\n'):'Koi pending task nahi hai.'}if(/^(?:meri memory|show memories|kya yaad hai)$/i.test(t))return state.memories.map(x=>'• '+x.text).join('\n')||'Abhi koi saved memory nahi hai.';m=t.match(/^(?:find lead|search lead|lead dhundo)\s*[:,-]?\s*(.+)$/i);if(m){if(typeof LEADS==='undefined')return'Lead database available nahi hai.';let q=m[1].toLowerCase(),a=LEADS.filter(x=>[x.n,x.a,x.city,x.p].some(y=>String(y||'').toLowerCase().includes(q))).slice(0,10);return a.length?a.map(x=>`${x.n} | ${x.p} | ${x.a||''}, ${x.city||'Mumbai'}`).join('\n'):'Lead nahi mili.'}return null}
+let busy=false;async function send(t){if(busy||!t.trim())return;ensure();let c=chat(),prior=c.messages.slice(-10);c.messages.push({role:'user',text:t});if(c.title==='New chat')c.title=t.slice(0,45);save();render();let ans=local(t);if(ans!==null){c.messages.push({role:'assistant',text:ans});save();bubble('bot',ans);return}busy=true;el('mdSend').disabled=true;el('mdStatus').textContent='Thinking…';let b=bubble('bot','Thinking…');try{const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),45000);let response;try{response=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,history:prior,system:`You are ${state.assistant}, a warm, intelligent assistant. Respond naturally in the user's language (Hindi, Hinglish or English). User name: ${state.name}. Style: ${state.style}. Custom instructions: ${state.custom}. Memories: ${state.memories.slice(-20).map(x=>x.text).join(' | ')}. Never claim to perform actions you haven't performed.`}),signal:ctl.signal})}finally{clearTimeout(timer)}let result=await response.json();if(!response.ok||result.error)throw Error(result.detail||result.error||'Server error');ans=result.reply||result.text||result.response||'No response';b.textContent=ans;c.messages.push({role:'assistant',text:ans});save()}catch(e){b.textContent='AI connect nahi hua: '+e.message+'\nChatGPT preview ya local browser ki network policy issue ho sakti hai. URL aur Cloudflare POST test karo.'}finally{busy=false;el('mdSend').disabled=false;el('mdStatus').textContent='Ready'}}
+function panel(html){el('mdDialogBody').innerHTML=html;el('mdDialog').classList.add('on')};function closePanel(){el('mdDialog').classList.remove('on')}
+function tasks(){panel('<h2>☑ Tasks</h2><input class="mdField" id="mdTaskText" placeholder="New task"><button id="mdTaskAdd" class="mdBtn">Add task</button><div id="mdTaskEntries"></div>');el('mdTaskAdd').onclick=()=>{let v=el('mdTaskText').value.trim();if(v){state.tasks.push({id:id(),text:v,done:false});save();tasks()}};for(let x of state.tasks){let d=document.createElement('div');d.className='mdEntry';let check=document.createElement('input');check.type='checkbox';check.checked=!!x.done;check.onchange=()=>{x.done=check.checked;save();tasks()};let label=document.createElement('span');label.textContent=x.text;let del=document.createElement('button');del.className='mdBtn';del.textContent='Delete';del.onclick=()=>{state.tasks=state.tasks.filter(y=>y.id!==x.id);save();tasks()};d.append(check,label,del);el('mdTaskEntries').append(d)}}
+function memories(){panel('<h2>🧠 Memory</h2><textarea class="mdField" id="mdMemoText" placeholder="Kya yaad rakhna hai?"></textarea><button class="mdBtn" id="mdMemoAdd">Remember</button><div id="mdMemoEntries"></div>');el('mdMemoAdd').onclick=()=>{let v=el('mdMemoText').value.trim();if(v){state.memories.push({id:id(),text:v});save();memories()}};for(let x of state.memories){let d=document.createElement('div');d.className='mdEntry';let span=document.createElement('span');span.textContent=x.text;let del=document.createElement('button');del.className='mdBtn';del.textContent='Forget';del.onclick=()=>{state.memories=state.memories.filter(y=>y.id!==x.id);save();memories()};d.append(span,del);el('mdMemoEntries').append(d)}}
+function settings(){panel('<h2>⚙ Settings</h2><label>Your name<input class="mdField" id="mdYourName"></label><label>Assistant name<input class="mdField" id="mdAssistantName"></label><label>Response style<select class="mdField" id="mdStyle"><option>friendly Hinglish</option><option>professional</option><option>short and direct</option><option>detailed</option></select></label><label>Custom instructions<textarea class="mdField" id="mdCustom"></textarea></label><p>AI backend: '+esc(API)+'</p><button class="mdBtn" id="mdSaveSettings">Save</button>');el('mdYourName').value=state.name;el('mdAssistantName').value=state.assistant;el('mdStyle').value=state.style;el('mdCustom').value=state.custom;el('mdSaveSettings').onclick=()=>{state.name=el('mdYourName').value.trim();state.assistant=el('mdAssistantName').value.trim()||'Mera Desk AI';state.style=el('mdStyle').value;state.custom=el('mdCustom').value;save();closePanel();render()}}
+function backup(){let u=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));let a=document.createElement('a');a.href=u;a.download='mera_desk_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}
+el('mdOpen').onclick=()=>{el('mdApp').classList.add('visible');ensure();render()};el('mdClose').onclick=()=>{closePanel();el('mdApp').classList.remove('visible')};el('mdNew').onclick=()=>{closePanel();addChat()};el('mdTasks').onclick=tasks;el('mdMemory').onclick=memories;el('mdSettings').onclick=settings;el('mdBackup').onclick=backup;el('mdBack').onclick=closePanel;el('mdForm').onsubmit=e=>{e.preventDefault();let t=el('mdInput').value.trim();if(!t)return;el('mdInput').value='';el('mdStatus').textContent='Sending…';send(t)};el('mdSend').type='button';el('mdSend').onclick=()=>{const t=el('mdInput').value.trim();if(!t)return;el('mdInput').value='';el('mdStatus').textContent='Sending…';send(t)};el('mdInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();el('mdForm').requestSubmit()}};
+})();
+    </script>
+    <!-- END MERA DESK -->
+    <!-- EXISTING CRM CHATBOT -->
+    <style>
+        #cbF {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 50;
+            min-width: 54px;
+            height: 54px;
+            padding: 0 12px;
+            border-radius: 27px;
+            font-weight: 700;
+            border: 0;
+            background: var(--teal);
+            color: #06231d;
+            font-size: 24px;
+            box-shadow: 0 4px 16px #0008
+        }
+
+        #cbP {
+            position: fixed;
+            right: 16px;
+            bottom: 80px;
+            z-index: 50;
+            width: min(400px, calc(100vw - 32px));
+            height: min(580px, 75vh);
+            display: none;
+            flex-direction: column;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px #000a
+        }
+
+        #cbP.show {
+            display: flex
+        }
+
+        #cbH {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700
+        }
+
+        #cbH small {
+            color: var(--mu);
+            font-weight: 400
+        }
+
+        #cbM {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .cbb {
+            max-width: 90%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 13px
+        }
+
+        .cbb.u {
+            align-self: flex-end;
+            background: var(--teal);
+            color: #06231d
+        }
+
+        .cbb.b {
+            align-self: flex-start;
+            background: #1c2a28
+        }
+
+        .cbb.a {
+            align-self: flex-start;
+            background: none;
+            color: var(--teal);
+            font-size: 11px;
+            padding: 0 4px
+        }
+
+        #cbQ {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding: 0 12px 8px
+        }
+
+        #cbQ button {
+            font-size: 11px;
+            padding: 5px 10px
+        }
+
+        #cbI {
+            display: flex;
+            gap: 6px;
+            padding: 10px;
+            border-top: 1px solid var(--line)
+        }
+
+        #cbI input {
+            flex: 1;
+            min-width: 0;
+            background: #0f1a18;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: inherit;
+            font-size: 14px
+        }
+
+        #cbP button:focus-visible,
+        #cbF:focus-visible,
+        #cbT:focus-visible {
+            outline: 2px solid var(--teal);
+            outline-offset: 2px
+        }
+
+        #cbP button:disabled {
+            opacity: .55;
+            cursor: not-allowed
+        }
+
+        #cbM {
+            overscroll-behavior: contain
+        }
+
+        #cbM .cbb {
+            line-height: 1.48
+        }
+
+        @media(max-width:480px) {
+            #cbP {
+                right: 8px;
+                bottom: 72px;
+                width: calc(100vw - 16px);
+                height: min(75dvh, 650px)
+            }
+
+            #cbF {
+                right: 12px;
+                bottom: 12px
+            }
+
+            #cbI {
+                flex-wrap: wrap
+            }
+
+            #cbI input {
+                flex-basis: 100%
+            }
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+            #cbP * {
+                scroll-behavior: auto !important
+            }
+        }
+    </style>
+    <button id="cbF" aria-label="Assistant" onclick="cbToggle()">💬</button>
+    <div id="cbP" role="dialog" aria-label="Desk Assistant" aria-modal="false">
+        <div id="cbH">
+            <span>Desk Assistant <small id="cbS"></small></span><span><button class="sm" onclick="cbSetup()">⚙ Mailer</button> <button class="sm" onclick="cbToggle()">✕</button></span>
+        </div>
+        <div id="cbM" role="log" aria-live="polite" aria-relevant="additions text"></div>
+        <div id="cbQ"></div>
+        <div id="cbI">
+            <input type="text" id="cbT" placeholder="Hinglish ya English mein likho…" autocomplete="off"><button class="sm" id="cbV" onclick="cbVoice()" title="Bol ke batao">🎤</button><button class="sm" id="cbL" onclick="cbLang()" title="Voice language">हि</button><button class="sm" onclick="cbSend()">Bhejo</button>
+        </div>
+    </div>
+    <script>
+        (()=>{
+const hist=(S.chat||[]).slice(-40);let snap=null,lastJ="", sending=false;
+const cleanText=x=>String(x??"").trim();
+const validEmail=x=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanText(x));
+const norm=x=>cleanText(x).toLocaleLowerCase().normalize("NFKC");
+const $i=id=>document.getElementById(id),p2=n=>String(n).padStart(2,"0");
+const fmtDT=d=>d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())+"T"+p2(d.getHours())+":"+p2(d.getMinutes());
+const QUICK=["Aaj ke follow-ups ko mail karo","Send follow-up mails to all due leads","Aaj ka summary do","Which hot leads have no email?","Busy wale sabko kal follow-up set karo","Auto follow-up mail ON karo"];
+const KB=`APP: Daily Calling Desk (Genesis Infoserve). Tabs: aaj, fu, sab, prod, rep. Card: Call, WhatsApp (sirf mobile 6-9), Email/Gmail/Outlook, Copy bold mail, script, AI script, Excel backup. Call result keys: uthaya, busy, no, wrong. Next keys: interest, quote, demo, won. Email field card mein; bulk emails Report tab mein. Follow-up datetime card mein; due hone pe banner. Data browser localStorage mein hai (cache clear = data gaya) -> Excel/JSON backup lo. Team cloud: Report tab mein Web App URL+naam+PIN, Apps Script deployment access Anyone. CSV columns: Company, Phone, Email, City, Area, Type, Category. Duplicate phone skip, extension wale numbers reject.`;
+const FAQ=[[/email|mail|gmail|outlook/i,"Lead card mein company ka email daalo, phir Email/Gmail/Outlook dabao. Bold ke liye 'Copy bold mail'. Bulk emails: Report tab."],[/sync|cloud|login|pin|connect/i,"Report tab: Web App URL (/exec), naam, PIN check karo, phir Connect/Sync. Apps Script access 'Anyone' hona chahiye."],[/backup|data|lost|gaya|gayab|restore/i,"Data browser mein hai, cache clear se ja sakta hai. Report tab se Excel/JSON backup lo."],[/whatsapp|\bwa\b/i,"WhatsApp sirf mobile numbers (6-9 se shuru) pe aata hai."],[/csv|import/i,"CSV mein Company, Phone, Email, City, Area, Type, Category columns rakho. Report tab > CSV import."]];
+window.cbToggle=()=>{const p=$i("cbP");p.classList.toggle("show");$i("cbF").setAttribute("aria-expanded",p.classList.contains("show"));if(!p.classList.contains("show")){ $i("cbF").focus();return;}lbl();if(!$i("cbM").children.length){if(hist.length)hist.forEach(h=>msg(h.r==="u"?"u":"b",h.t));else msg("b","Namaste! / Hi! Main kaam khud karta hoon, sirf batao. Examples:\n• Aaj ke follow-ups ko mail karo\n• Kal subah 10 baje sab interested leads ko mail schedule karo\n• Turn on auto follow-up mails\n• Security wale jinhone call nahi uthaya, unko kal ke liye follow-up set karo\n• Export all leads with quotes to Excel\nHinglish ya English (aur 🎤 voice) chalega. Mailer ke bina bhi sab chalta hai; bina-click auto-send chahiye to ⚙ Mailer.")}dayBrief();$i("cbT").focus()};
+function lbl(){$i("cbS").textContent=(aiFn()?"· AI ON":"· basic")+(mOn()?" · ✉ auto-mail ON":" · ✉ off")}
+function msg(c,t){const m=$i("cbM"),d=document.createElement("div");d.className="cbb "+c;d.textContent=t;m.append(d);m.scrollTop=m.scrollHeight;return d}
+function btns(list){const m=$i("cbM"),d=document.createElement("div");d.className="cbb a";d.style.cssText="display:flex;gap:6px;flex-wrap:wrap";list.forEach(([t,f])=>{const b=document.createElement("button");b.className="sm";b.textContent=t;b.onclick=()=>f(b,d);d.append(b)});m.append(d);m.scrollTop=m.scrollHeight;return d}
+function find(n){n=norm(n);if(!n)return null;const d=n.replace(/\D/g,"");return LEADS.find(l=>norm(l.n)===n)||LEADS.find(l=>norm(l.n).includes(n))||(d.length>=8?LEADS.find(l=>digits(l.p).endsWith(d.slice(-10))):null)}
+/* ---- lead selector ---- */
+function sel(f){f=f||{};if(Array.isArray(f.names))return [...new Map(f.names.map(find).filter(Boolean).map(l=>[l.id,l])).values()];const now=new Date(),eod=new Date();eod.setHours(23,59,59,999);
+ return LEADS.filter(l=>{const o=L(l.id),fu=o.fu?new Date(o.fu):null,em=(o.email||"").trim();
+  if(f.due&&!(fu&&fu<=eod&&o.next!=="won"))return false;
+  if(f.overdue&&!(fu&&fu<now&&o.next!=="won"))return false;
+  if(f.fu_today&&!(fu&&fu.toDateString()===now.toDateString()))return false;
+  if(f.has_fu&&!fu)return false;
+  if(f.pending_fu&&!(o.fu||o.res==="busy"||(o.next&&o.next!=="won")))return false;
+  if(f.email===true&&!validEmail(em))return false;if(f.email===false&&validEmail(em))return false;
+  if(f.cat&&l.c!==f.cat)return false;
+  if(f.city&&(l.city||"Mumbai").toLowerCase()!==String(f.city).toLowerCase())return false;
+  if(f.res!==undefined&&(o.res||"")!==f.res)return false;
+  if(f.next!==undefined&&(o.next||"")!==f.next)return false;
+  if(f.called===true&&!o.res)return false;if(f.called===false&&o.res)return false;
+  if(f.called_today&&o.day!==today)return false;
+  if(f.has_quote&&!o.qa)return false;
+  if(f.product&&!PR(l).includes(f.product))return false;
+  if(f.mobile&&!isMobile(l.p))return false;
+  if(f.text&&!(l.n+" "+l.a+" "+l.t+" "+(o.note||"")+" "+(o.cn||"")).toLowerCase().includes(String(f.text).toLowerCase()))return false;
+  return true}).slice(0,Math.min(1000,Math.max(1,Number(f.limit)||300)))}
+const brief=l=>{const o=L(l.id);return l.n+" | "+(o.email||"no-email")+" | "+(o.res||"-")+"/"+(o.next||"-")+" | fu:"+(o.fu||"-")+(o.note?" | "+o.note.slice(0,40):"")};
+function applySet(l,s){const o=L(l.id);
+ if(s.res!==undefined&&(s.res===""||RES.some(x=>x[0]===s.res))){o.res=s.res;o.day=s.res?today:""}
+ if(s.next!==undefined&&(s.next===""||NXT.some(x=>x[0]===s.next)))o.next=s.next;
+ if(s.note)o.note=(o.note?o.note+"\n":"")+s.note;
+ if(s.fu_days!=null&&!isNaN(+s.fu_days)){const d=new Date();d.setDate(d.getDate()+ +s.fu_days);d.setHours(11,0,0,0);o.fu=fmtDT(d)}
+ if(s.fu===""||(s.fu&&!isNaN(new Date(s.fu))))o.fu=s.fu;
+ if(s.assign!==undefined)o.as=s.assign}
+const snapSave=()=>{snap=JSON.stringify(S.leads)};
+function undoBtn(){btns([["↩ Undo",(b)=>{if(!snap)return;S.leads=JSON.parse(snap);save();render();b.textContent="✓ Undo ho gaya";b.disabled=true}]])}
+const fill=(s,l)=>String(s).replace(/\{company\}/gi,l.n).replace(/\{contact\}/gi,L(l.id).cn||"Sir/Madam").replace(/\{me\}/gi,S.name||"");
+function mailUrl(l,a){const o=L(l.id),e=encodeURIComponent((o.email||"").trim());
+ const m=a.body?{subject:fill(a.subject||"Genesis Infoserve Pvt. Ltd.",l),body:fill(a.body,l)}:mailParts(l,a.kind==="intro"?undefined:"fu");
+ const su=encodeURIComponent(m.subject),bo=encodeURIComponent(m.body),pv=a.provider||S.prov||"gmail";
+ return pv==="outlook"?`https://outlook.office.com/mail/deeplink/compose?to=${e}&subject=${su}&body=${bo}`:pv==="mailto"?`mailto:${e}?subject=${su}&body=${bo}`:`https://mail.google.com/mail/?view=cm&fs=1&to=${e}&su=${su}&body=${bo}`}
+function queue(title,items,then){if(!items.length)return title+": koi eligible lead nahi mili.";let i=0;
+ const el=btns([["",()=>{}],["Skip ⏭",()=>{if(i<items.length){i++;lab()}}]]),b=el.firstChild;
+ const lab=()=>{b.textContent=i<items.length?`▶ ${title} ${i+1}/${items.length}: ${items[i].l.n}`:"✓ Sab ho gaya";b.disabled=i>=items.length};
+ b.onclick=()=>{if(i>=items.length)return;const it=items[i],a=document.createElement("a");a.href=it.url;a.target="_blank";a.rel="noopener";document.body.append(a);a.click();a.remove();i++;/* Do NOT mark sent: composer opening does not prove mail was sent. */lab();if(i>=items.length)render()};lab();
+ return items.length+" drafts ready. Har button se compose window khulegi. Mail bhejne ke baad CRM mein result manually update karein (auto-confirm nahi ho sakta)."}
+/* ---- Mailer (Apps Script) client ---- */
+function MU(){return (S.mailer||"").trim()}
+function mOn(){return !!(MU()&&S.mkey&&/^https:\/\//i.test(MU()))}
+async function mpost(o){if(!mOn())throw new Error("Mailer URL/key missing or insecure");
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);
+  try{const r=await fetch(MU(),{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({key:S.mkey,...o}),signal:controller.signal});
+  if(!r.ok)throw new Error("Mailer HTTP "+r.status);
+  let j;try{j=await r.json()}catch(e){throw new Error("Mailer ne valid JSON return nahi kiya")}
+  if(!j||typeof j!=="object")throw new Error("Mailer response invalid");if(j.err)throw new Error(String(j.err));return j}
+  catch(e){if(e.name==="AbortError")throw new Error("Mailer timeout (25s)");throw e}finally{clearTimeout(timer)}}
+function aiFn(){return typeof AI!=="undefined"&&AI?AI:(mOn()&&S.aiOk?async p=>({text:(await mpost({a:"ai",prompt:p})).text}):null)}
+function mailPayload(l,a){const o=L(l.id);let m,html,text;
+ if(a.body){m={subject:fill(a.subject||"Genesis Infoserve Pvt. Ltd.",l),body:fill(a.body,l)};text=m.body;html=esc(m.body).replace(/\n/g,"<br>")}
+ else if(a.kind==="intro"){m=mailParts(l);const r=richMail(l);text=r.plain;html=r.html}
+ else{m=mailParts(l,"fu");text=m.body;html=esc(m.body).replace(/\n/g,"<br>")}
+ return{id:String(l.id),to:(o.email||"").trim(),subject:m.subject,text,html:'<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt">'+html+"</div>",name:(S.name?S.name+" - ":"")+"Genesis Infoserve"}}
+async function mailSend(a){
+ if(!mOn()){msg("b","Auto-mail ON nahi hai (⚙ Mailer setup baki). Tab tak queue bana deta hoon.");const m=act({...a,type:"mail_queue"});if(m)msg("a",m);return}
+ const r=sel({...a.f,email:true}),no=sel({...a.f,email:false}),when=a.sendAt&&!isNaN(new Date(a.sendAt))?new Date(a.sendAt):null;
+ if(!r.length){msg("b","Koi eligible lead nahi mili (valid email wali).");return}
+ msg("b",r.length+" mail "+(when?when.toLocaleString("en-IN")+" ko ":"abhi ")+"Gmail se bhejne hain: "+r.slice(0,3).map(l=>l.n).join(", ")+(r.length>3?"…":"")+(no.length?"\n("+no.length+" ka email nahi, skip)":"")+"\nMail wapas nahi li ja sakti. Confirm?");
+ btns([["✅ Haan, bhejo",async(b,d)=>{if(sending)return;sending=true;d.remove();const w=msg("a",when?"Schedule request bhej raha hoon…":"Bhej raha hoon…");
+  try{const jobs=r.map(l=>({...mailPayload(l,a),sendAt:when?when.toISOString():undefined})),res=await mpost({a:when?"schedule":"send",jobs});
+    const ids=when?(res.scheduled||res.queued||[]):(res.sent||[]);
+    const ok=new Set(ids.map(v=>String(typeof v==="object"?v.id:v)));
+   r.filter(l=>ok.has(String(l.id))).forEach(l=>applySet(l,{note:when?"Mail scheduled":"Mail bheja (auto)",...(a.then||{})}));save();render();
+   w.textContent=when?"✓ "+ok.size+"/"+jobs.length+" mails scheduler ne confirm kiye":"✓ "+(res.sent||[]).length+" mail bhej diye"+((res.failed||[]).length?", "+res.failed.length+" fail: "+res.failed.slice(0,3).map(x=>x.err).join("; "):"")+(res.quota!=null?" · aaj ka quota bacha: "+res.quota:"")}
+  catch(e){w.textContent="Mail fail: "+e.message}finally{sending=false}}],["❌ Cancel",(b,d)=>{d.remove();msg("a","Cancel kiya")}]])}
+function autoFu(a){S.auto={on:a.on!==false,kind:a.kind==="intro"?"intro":"fu"};save();
+ if(!S.auto.on){if(mOn())mpost({a:"cancel_all"}).catch(()=>{});msg("a","✓ Auto follow-up mail band");return}
+ if(!mOn()){S.auto.on=false;save();msg("b","Pehle ⚙ Mailer setup karo, phir auto follow-up chalega.");return}
+ const od=LEADS.filter(l=>{const o=L(l.id);return o.fu&&new Date(o.fu)<new Date()&&o.next!=="won"&&(o.email||"").trim()&&o.mfu!==o.fu});
+ const on=()=>{syncAuto(true);msg("a","✓ Auto follow-up mail ON: har lead ka follow-up time aate hi mail apne aap jayega (page band ho tab bhi).")};
+ if(!od.length){on();return}
+ msg("b",od.length+" leads ka follow-up time nikal chuka hai (jaise "+od.slice(0,3).map(l=>l.n).join(", ")+"). Unhe bhi abhi mail bhejun?");
+ btns([["✅ Haan, unhe bhi",(b,d)=>{d.remove();on()}],["Nahi, sirf aage ke",(b,d)=>{d.remove();od.forEach(l=>{L(l.id).mfu=L(l.id).fu});save();on()}]])}
+async function syncAuto(force){if(!(S.auto&&S.auto.on&&mOn()))return;
+ const jobs=LEADS.filter(l=>{const o=L(l.id);return o.fu&&o.next!=="won"&&(o.email||"").trim()&&o.mfu!==o.fu}).map(l=>({...mailPayload(l,{kind:S.auto.kind}),id:"fu_"+l.id,sendAt:new Date(L(l.id).fu).toISOString()})),h=JSON.stringify(jobs.map(j=>[j.id,j.sendAt,j.to,j.subject]));
+ try{const res=await mpost(force||h!==lastJ?{a:"schedule",jobs,replace:"fu_"}:{a:"status"});lastJ=h;let ch=false;
+  (res.recent||[]).forEach(r=>{if(String(r.id).indexOf("fu_")!==0)return;const l=LEADS.find(x=>"fu_"+x.id===r.id);if(!l)return;const o=L(l.id);if(o.fu&&o.mfu!==o.fu&&new Date(o.fu).toISOString()===r.sendAt){o.mfu=o.fu;o.note=(o.note?o.note+"\n":"")+"Auto follow-up mail bheja ("+new Date(r.at).toLocaleString("en-IN")+")";ch=true}});
+  if(ch){save();render()}}catch(e){}}
+window.cbSetup=()=>showM(`<h3>✉ Mailer setup</h3><p class="sub">mailer.gs ko Apps Script mein deploy karo (steps file ke upar likhe hain), phir yahan Web App URL aur key daalo.</p><p><input type="text" id="mu" style="width:100%" placeholder="Web App URL (…/exec)" value="${esc(S.mailer||"")}"></p><p><input type="password" id="mk" style="width:100%" placeholder="Mailer key" value="${esc(S.mkey||"")}"></p><button class="sm" onclick="cbSave()">Save + test</button> <button class="sm" onclick="closeM()">Band karo</button><p class="sub" id="mt"></p>`);
+window.cbSave=async()=>{const url=$i("mu").value.trim(),key=$i("mk").value.trim();if(!/^https:\/\//i.test(url)||!key){$i("mt").textContent="HTTPS Web App URL aur key dono zaroori hain";return}S.mailer=url;S.mkey=key;save();$i("mt").textContent="Test ho raha hai…";
+ try{const r=await mpost({a:"ping"});S.aiOk=!!r.ai;save();$i("mt").textContent="✓ Connected: "+r.from+" · aaj ke mails bache: "+r.left+(r.ai?" · AI proxy ON":" · AI proxy off (optional)");lbl()}
+ catch(e){$i("mt").textContent="✗ "+e.message+(/fetch/i.test(e.message)?" (URL galat hai, ya page ki security is link ko block kar rahi hai: page ko apni hosting par chalao)":"")}};
+/* ---- v4: browser-only power features ---- */
+const run=a=>{const m=act(a);if(m)msg("a","✓ "+m)};
+function score(l){const o=L(l.id),now=new Date(),fu=o.fu?new Date(o.fu):null;let s=0;const why=[];
+ if(o.res==="wrong"||o.next==="won")return{s:-999,why};
+ if(o.res==="no")s-=60;
+ if(fu){if(fu<now){s+=60;why.push("follow-up overdue")}else if(fu.toDateString()===now.toDateString()){s+=50;why.push("follow-up aaj")}}
+ if(o.next==="demo"){s+=45;why.push("demo/meeting")}else if(o.next==="quote"){s+=40;why.push("quote bheja")}else if(o.next==="interest"){s+=35;why.push("interested")}
+ if(o.res==="busy"){s+=25;why.push("busy tha")}
+ if(!o.res&&!o.next){s+=10;why.push("nayi lead")}
+ if(o.res==="uthaya"){s+=8;why.push("pehle uthaya nahi")}
+ s+=({H:5,N:4,D:3,S:2})[KIND(l)]+(isMobile(l.p)?3:0);return{s,why}}
+function plan(f,n){return sel(f).map(l=>({l,...score(l)})).filter(x=>x.s>-100&&!(L(x.l.id).day===today&&L(x.l.id).res&&L(x.l.id).res!=="busy")).sort((a,b)=>b.s-a.s).slice(0,n||15)}
+function callMode(a){const items=plan(a.f,a.n||30).map(x=>x.l);if(!items.length)return"Call karne layak koi lead nahi mili.";
+ let i=0;snapSave();const m=$i("cbM"),d=document.createElement("div");d.className="cbb b";d.style.width="94%";m.append(d);
+ const draw=()=>{if(i>=items.length){d.innerHTML="🎉 Calling mode khatam ("+items.length+" leads).";render();return}
+  const l=items[i],o=L(l.id),sc=score(l);
+  d.innerHTML=`<div class="sub">${i+1}/${items.length} · ${esc(sc.why.join(", ")||"call")}</div><b>${esc(l.n)}</b><div class="sub">${esc(l.a||"")}, ${esc(l.city||"Mumbai")} · ${esc(l.t||"")}</div>${o.note?`<div class="sub">📝 ${esc(o.note.slice(-120))}</div>`:""}<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"><a class="sm" style="text-decoration:none" href="${tel(l.p)}">📞 ${esc(l.p)}</a>${isMobile(l.p)?`<a class="sm wa" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/${digits(l.p)}">WA</a>`:""}<button class="sm" data-k="sc">Script</button></div><div style="display:flex;gap:6px;flex-wrap:wrap">${[["uthaya","Uthaya nahi"],["busy","Busy (kal)"],["no","Interested nahi"],["wrong","Galat no."]].map(([k,t])=>`<button class="sm" data-r="${k}">${t}</button>`).join("")}${[["interest","✅ Interested"],["quote","Quote"],["demo","Demo"]].map(([k,t])=>`<button class="sm" data-n="${k}">${t}</button>`).join("")}<button class="sm" data-k="skip">Skip →</button><button class="sm" data-k="stop">Stop</button></div><input type="text" class="em" id="cmn" placeholder="Note (optional), phir result dabao" style="margin-top:8px">`;m.scrollTop=m.scrollHeight};
+ d.onclick=e=>{const b=e.target.closest("button");if(!b)return;const l=items[i],k=b.dataset;
+  if(k.k==="sc"){showM(script(l));return}
+  if(k.k==="stop"){i=items.length;draw();return}
+  if(k.k!=="skip"){const note=((d.querySelector("#cmn")||{}).value||"").trim(),o=L(l.id);
+   if(k.r)applySet(l,{res:k.r,note,...(k.r==="busy"?{fu_days:1}:{})});
+   else if(k.n){applySet(l,{next:k.n,note,...(k.n==="interest"?{fu_days:2}:k.n==="quote"?{fu_days:3}:{})});o.day=today}
+   save()}
+  i++;draw()};
+ draw();return"Calling mode shuru: "+items.length+" leads, priority order mein. Result dabate jao, agli lead apne aap aayegi."}
+function dayText(){const due=sel({due:true}),top=plan({},5),calls=LEADS.filter(l=>L(l.id).day===today).length;
+ return "Aaj ka plan ("+new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"short"})+"):\n• Follow-up due: "+due.length+" (email wale: "+due.filter(l=>(L(l.id).email||"").trim()).length+")\n• Aaj ke calls: "+calls+"/"+S.target+"\n• Top priority: "+(top.map(x=>x.l.n).join(", ")||"-")}
+function dayBrief(){if(S.lastBrief===today)return;S.lastBrief=today;save();msg("b",dayText());
+ btns([["📞 Calling mode",()=>run({type:"call_mode"})],["📋 Priority list",()=>run({type:"plan"})],["✉ Due follow-up mails",()=>run({type:mOn()?"mail_send":"mail_queue",f:{due:true},kind:"fu",then:{fu_days:3,note:"Follow-up mail bheja"}})]])}
+function reportText(){const all=LEADS,td=all.filter(l=>L(l.id).day===today),c=k=>td.filter(l=>L(l.id).res===k).length,hot=td.filter(l=>["interest","quote","demo"].includes(L(l.id).next)),t=new Date();t.setDate(t.getDate()+1);
+ const tom=all.filter(l=>L(l.id).fu&&new Date(L(l.id).fu).toDateString()===t.toDateString()),qv=all.reduce((x,l)=>x+(parseFloat(String(L(l.id).qa||"").replace(/[^\d.]/g,""))||0),0);
+ return "📊 Daily Report - "+(S.name||"")+" ("+new Date().toLocaleDateString("en-IN")+")\nCalls: "+td.length+"/"+S.target+"\nUthaya nahi: "+c("uthaya")+" | Busy: "+c("busy")+" | Not interested: "+c("no")+" | Wrong no.: "+c("wrong")+"\nHot leads aaj: "+hot.length+(hot.length?" ("+hot.slice(0,5).map(l=>l.n).join(", ")+")":"")+"\nQuote pipeline: Rs "+qv.toLocaleString("en-IN")+"\nKal ke follow-ups: "+tom.length}
+function badge(){try{const n=sel({due:true}).length;$i("cbF").textContent=n?"💬 "+n:"💬"}catch(e){}}
+let rec=null,vl="hi-IN";
+window.cbLang=()=>{vl=vl==="hi-IN"?"en-IN":"hi-IN";$i("cbL").textContent=vl==="hi-IN"?"हि":"EN"};
+window.cbVoice=()=>{const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){toast("Voice ke liye Chrome use karo");return}
+ if(rec){rec.stop();return}rec=new R();rec.lang=vl;rec.interimResults=false;
+ rec.onresult=e=>{$i("cbT").value=e.results[0][0].transcript;cbSend()};rec.onend=()=>{rec=null;$i("cbV").textContent="🎤"};rec.onerror=()=>{};
+ $i("cbV").textContent="🔴";rec.start()};
+/* ---- action runner ---- */
+function act(a){try{switch(a.type){
+ case"tab":if(["aaj","fu","sab","prod","rep"].includes(a.value)){tab=a.value;render();return"Tab: "+a.value}break;
+ case"filter":if(a.cat!==undefined)cat=a.cat||"Sab";if(a.area!==undefined)area=a.area||"Sab shehar";if(a.prod!==undefined)prod=a.prod||"Sab products";if(a.q!==undefined)q=a.q||"";if(tab==="prod"||tab==="rep")tab="sab";render();return"Filter lag gaya";
+ case"target":{const n=+a.value;if(n>0){S.target=n;save();render();return"Target "+n}break}
+ case"open":{const l=find(a.lead);if(l){gJump(l.id);return"Khola: "+l.n}return"Lead nahi mili: "+a.lead}
+ case"update":{const l=find(a.lead);if(!l)return"Lead nahi mili: "+a.lead;snapSave();const s={...a};if(a.email&&/\S+@\S+\.\S+/.test(a.email))L(l.id).email=a.email;if(a.cn)L(l.id).cn=a.cn;applySet(l,s);save();render();return l.n+" update ho gaya"}
+ case"script":{const l=find(a.lead);if(l){showM(script(l));return"Script: "+l.n}return"Lead nahi mili"}
+ case"email_draft":{const l=find(a.lead);if(l){add2(l);return"Draft upar hai"}return"Lead nahi mili"}
+ case"call_mode":return callMode(a);
+ case"plan":{const r=plan(a.f,a.n||10);if(!r.length)return"Koi priority lead nahi mili";const m=$i("cbM"),d=document.createElement("div");d.className="cbb b";d.innerHTML="<b>Aaj kisko call karein:</b>"+r.map((x,i)=>`<div style="margin:5px 0">${i+1}. <b>${esc(x.l.n)}</b> <span class="sub">${esc(x.why.join(", ")||"call")}</span> <a class="sm" style="text-decoration:none" href="${tel(x.l.p)}">📞</a></div>`).join("");m.append(d);m.scrollTop=m.scrollHeight;return""}
+ case"report":{const t=reportText();msg("b",t);btns([["📋 Copy",()=>{navigator.clipboard&&navigator.clipboard.writeText(t);toast("Report copy ho gayi")}],["💬 WhatsApp pe bhejo",()=>window.open("https://wa.me/?text="+encodeURIComponent(t),"_blank","noopener")]]);return""}
+ case"copy_emails":{const r=sel({...a.f,email:true});if(!r.length)return"Koi email nahi mila";navigator.clipboard&&navigator.clipboard.writeText(r.map(l=>L(l.id).email.trim()).join(", "));return r.length+" emails copy ho gaye (BCC mein paste karo)"}
+ case"add_leads":{const arr=(a.leads||[]).filter(x=>x&&x.n).slice(0,50).map(x=>({n:String(x.n),p:x.p||"",e:x.e||"",cn:x.cn||"",city:x.city||"",a:x.a||"",t:x.t||"",c:["Design software","Security","IT Hardware","Networking & CCTV"].includes(x.c)?x.c:"IT Hardware"}));
+  if(!arr.length)return"Koi lead nahi mili";msg("b",arr.length+" naye leads jodne hain: "+arr.slice(0,5).map(x=>x.n+(x.p?" ("+x.p+")":"")).join(", ")+(arr.length>5?"…":"")+"\nConfirm?");
+  btns([["✅ Jodo",(b,d)=>{d.remove();const r=addLeads(arr);msg("a","✓ "+r.add+" jude, "+r.dup+" duplicate ya galat number skip")}],["❌ Cancel",(b,d)=>d.remove()]]);return""}
+ case"provider":S.prov=["gmail","outlook","mailto"].includes(a.value)?a.value:"gmail";save();return"Mail provider: "+S.prov;
+ case"mail_send":mailSend(a);return"";
+ case"auto_followup":autoFu(a);return"";
+ case"remember":{S.mem=[...(S.mem||[]),String(a.text||"").slice(0,200)].slice(-30);save();return"Yaad rakh liya"}
+ case"forget":S.mem=[];save();return"Saved assistant preferences clear ho gayi (lead data aur chat history unaffected)";
+ case"backup":xlAll();return"Excel backup";
+ case"export":{const r=sel(a.f);if(!r.length)return"Export: koi lead nahi mili";dlx("chat_export_"+stamp()+".xlsx",[xsheet("Leads",r)]);return r.length+" leads Excel mein"}
+ case"call_list":{const r=sel(a.f);if(!r.length)return"Koi lead nahi mili";const m=$i("cbM"),d=document.createElement("div");d.className="cbb b";d.innerHTML=r.slice(0,25).map(l=>`<div style="margin-bottom:4px"><b>${esc(l.n)}</b> <a class="sm" style="text-decoration:none" href="${tel(l.p)}">📞 ${esc(l.p)}</a></div>`).join("")+(r.length>25?`<div class="sub">+${r.length-25} aur</div>`:"");m.append(d);m.scrollTop=m.scrollHeight;return r.length+" leads ki call list"}
+ case"bulk_update":{const r=sel(a.f),s=a.set||{};if(!r.length)return"Bulk update: koi lead nahi mili";
+  const go=()=>{snapSave();r.forEach(l=>applySet(l,s));save();render();msg("a","✓ "+r.length+" leads update ho gaye");undoBtn()};
+  if(r.length<=3){go();return""}
+  msg("b",r.length+" leads badalni hain ("+r.slice(0,4).map(l=>l.n).join(", ")+"…). Confirm karo.");btns([["✅ Haan, karo",(b,d)=>{d.remove();go()}],["❌ Cancel",(b,d)=>{d.remove();msg("a","Cancel kiya")}]]);return""}
+ case"mail_queue":{const r=sel({...a.f,email:true}),no=sel({...a.f,email:false});const out=queue("Mail",r.map(l=>({l,url:mailUrl(l,a)})),a.then);return out+(no.length?"\n"+no.length+" leads ka email nahi hai (skip): "+no.slice(0,5).map(l=>l.n).join(", ")+(no.length>5?"…":""):"")}
+ case"wa_queue":{const r=sel({...a.f,mobile:true});return queue("WhatsApp",r.map(l=>({l,url:"https://wa.me/"+digits(l.p)+"?text="+encodeURIComponent(a.text?fill(a.text,l):"Namaste, main "+(S.name||"")+" Genesis Infoserve, Mumbai se. "+T[KIND(l)].wa)})),a.then)}
+ }}catch(e){return"Action fail: "+e.message}return""}
+function add2(l){const m=mailParts(l);msg("b","Subject: "+m.subject+"\n\n"+richMail(l).plain)}
+function ctx(){const calls=LEADS.filter(l=>L(l.id).day===today).length,due=sel({due:true});
+ return `Abhi: tab=${tab}, cat=${cat}, shehar=${area}, product=${prod}, search="${q}"\nTotal leads ${LEADS.length}, aaj ke calls ${calls}/${S.target}\nFollow-up due (aaj tak): ${due.length}, jinme email hai: ${due.filter(l=>(L(l.id).email||"").trim()).length}\nMailer (auto-send): ${mOn()?"ON":"OFF"}, auto follow-up: ${S.auto&&S.auto.on?"ON":"off"}\nYaad rakhi baatein: ${(S.mem||[]).join(" | ")||"-"}\nUser: ${S.name}, cloud: ${cloudMsg||"off"}, ${xlAgo()}\nAbhi: ${new Date().toString().slice(0,21)}`}
+const SCHEMA=`F (filter object, saari keys optional): {"due":true (follow-up aaj tak ya overdue, won ko chhodke),"overdue":true,"fu_today":true,"has_fu":true,"pending_fu":true,"email":true|false,"cat":"IT Hardware|Networking & CCTV|Design software|Security","city":"Pune","res":"uthaya|busy|no|wrong|\\"\\"","next":"interest|quote|demo|won|\\"\\"","called":true|false,"called_today":true,"has_quote":true,"product":"Laptops","mobile":true,"text":"naam/note mein dhundo","names":["Lead A","Lead B"],"limit":50}
+ACTIONS:
+{"type":"find","f":F}  (data dekhna ho to; result tumhe wapas milega, phir final jawab do)
+{"type":"mail_queue","f":F,"kind":"fu|intro","provider":"gmail|outlook|mailto","subject":"opt","body":"opt custom, {company} {contact} {me} use kar sakte ho","then":{"fu_days":3,"note":"Follow-up mail bheja"}}
+{"type":"mail_send","f":F,"kind":"fu|intro","subject":"opt","body":"opt custom","sendAt":"opt 2026-10-26T10:00","then":{"fu_days":3,"note":"Follow-up mail bheja"}}
+{"type":"auto_followup","on":true|false,"kind":"fu|intro"} {"type":"remember","text":"..."} {"type":"forget"}
+{"type":"call_mode","f":F,"n":30} {"type":"plan","f":F,"n":10} {"type":"report"} {"type":"copy_emails","f":F} {"type":"provider","value":"gmail|outlook|mailto"}
+{"type":"add_leads","leads":[{"n":"Company","p":"+91 98xxx","e":"mail","cn":"person","city":"Pune","a":"area","t":"Architect","c":"Design software"}]}
+{"type":"wa_queue","f":F,"text":"opt","then":{...}}
+{"type":"bulk_update","f":F,"set":{"res":"","next":"","note":"","fu_days":1,"fu":"2026-10-26T11:00","assign":"naam"}}
+{"type":"update","lead":"naam","res":"","next":"","note":"","email":"","cn":"","fu_days":2,"fu":"datetime"}
+{"type":"call_list","f":F} {"type":"export","f":F} {"type":"backup"} {"type":"script","lead":"naam"} {"type":"email_draft","lead":"naam"} {"type":"open","lead":"naam"} {"type":"tab","value":"aaj|fu|sab|prod|rep"} {"type":"filter","cat":"","area":"","prod":"","q":""} {"type":"target","value":50}`;
+async function ask(t,extra){
+ const p=`Tum "Desk Assistant" ho: Genesis Infoserve (Mumbai IT reseller) ke Daily Calling Desk app ke andar ka autonomous sales agent. User Hinglish (Roman Hindi), English ya mix mein likhega; usi language/style mein chhota, saaf jawab do. Jab user koi kaam bole (jaise "aaj ke follow-ups ko mail karo"), sawaal mat poochho jab tak zaroori na ho: sahi filter chunke seedha actions bhejo. "Aaj ke follow-ups" = {"due":true}. Mail bhejne ke liye: agar Mailer ON hai to "mail_send" (Gmail se khud send hota hai, user ko confirm button dikhta hai; "kal subah 10 baje" jaise time ke liye sendAt local "YYYY-MM-DDTHH:mm" do), warna "mail_queue" (user har compose window mein Send dabata hai). Follow-up mail ke baad default then={"fu_days":3,"note":"Follow-up mail bheja"} lagao jab tak user kuch aur na bole. "Roz / automatically follow-up mail bhejte raho" ka matlab auto_followup. User ki zaroori preference ("hamesha X karo") ho to remember se save karo. User Devanagari (हिंदी) mein bhi likh sakta hai. "Calling shuru karo / start calling" = call_mode. "Kisko call karun / who should I call" = plan. "Report / hisaab" = report. Mailer OFF ho aur user sabko ek hi mail bhejna chahe to copy_emails (BCC) bhi suggest kar sakte ho. User jab messy text (naam, phone, company) paste kare aur "save/add karo" bole, to usse leads nikaal ke add_leads bhejo (c category chuno: Design software, Security, IT Hardware, Networking & CCTV). "Mail provider outlook rakho" = provider. Pehle count/data chahiye to "find" bhejo. Problem ho to step-by-step solution do. Jo pata nahi wo andaza mat lagao.\n\n${KB}\n\nLIVE STATE:\n${ctx()}\n\n${SCHEMA}\n\nSIRF valid JSON do: {"reply":"...","actions":[...]}${extra?"\n\nTUMHARE FIND RESULTS:\n"+extra+"\nAb final reply aur actions do (find dobara mat bhejo).":""}\n\nCHAT:\n${hist.slice(-8).map(h=>(h.r==="u"?"User: ":"Bot: ")+h.t).join("\n")}\nUser: ${t}`;
+ const r=await aiFn()(p,{modelTier:"quick"});
+ try{const raw=cleanText(r.text).replace(/^```(?:json)?\s*/i,"").replace(/\s*```$/,"");const j=JSON.parse(raw);return{reply:typeof j.reply==="string"?j.reply:"",actions:Array.isArray(j.actions)?j.actions:[]}}catch(e){return{reply:cleanText(r.text)||"AI response samajh nahi aaya",actions:[]}}}
+async function agent(t){
+ if(aiFn()){let extra="";
+  for(let k=0;k<3;k++){const j=await ask(t,extra),acts=Array.isArray(j.actions)?j.actions.slice(0,6):[],fs=acts.filter(a=>a.type==="find");
+   if(fs.length&&k<2){fs.forEach(a=>{const r=sel(a.f);extra+="find "+JSON.stringify(a.f)+" -> "+r.length+" leads"+(r.length?":\n"+r.slice(0,15).map(brief).join("\n")+(r.length>15?"\n…+"+(r.length-15)+" aur":""):"")+"\n"});continue}
+   return{reply:j.reply||"Request process ki.",actions:acts.filter(a=>a&&typeof a==="object"&&a.type!=="find") }}
+  return{reply:"Thoda complex tha, dobara try karo.",actions:[]}}
+ /* basic mode (AI OFF): Hinglish + English */
+ if(/calling mode|call shuru|start calling|calling shuru|dialer|कॉल शुरू/i.test(t))return{reply:"Calling mode shuru kar raha hoon.",actions:[{type:"call_mode"}]};
+ if(/priority|kisko call|kise call|who.*call|plan|कौन.*कॉल/i.test(t))return{reply:"Aaj ki priority list:",actions:[{type:"plan"}]};
+ if(/report|रिपोर्ट/i.test(t))return{reply:"Daily report:",actions:[{type:"report"}]};
+ if(/(copy|bcc).*(email|mail)/i.test(t)){return{reply:"Due leads ke emails copy kar raha hoon.",actions:[{type:"copy_emails",f:{due:true}}]}}
+ if(/(follow.?up|फॉलो)/i.test(t)&&/(mail|email|मेल)/i.test(t))return{reply:"Due follow-ups ki mail queue bana raha hoon.",actions:[{type:mOn()?"mail_send":"mail_queue",f:{due:true},kind:"fu",then:{fu_days:3,note:"Follow-up mail bheja"}}]};
+ if(/summary|report|status|hisab/i.test(t))return{reply:ctx(),actions:[]};
+ if(/(due|follow)/i.test(t)&&/(dikha|kaun|kholo|show|list|which)/i.test(t))return{reply:"Follow-up tab khol diya.",actions:[{type:"tab",value:"fu"}]};
+ if(/backup|export/i.test(t)&&/excel|xlsx/i.test(t))return{reply:"Excel backup le raha hoon.",actions:[{type:"backup"}]};
+ const f=FAQ.find(x=>x[0].test(t));
+ return{reply:f?f[1]:"Basic mode mein ye chalte hain: calling mode, priority list, daily report, follow-up mail queue, summary, follow-up tab, Excel backup, BCC emails copy aur FAQ. Poora agent tab chalega jab page Claude ke andar published ho (AI ON).",actions:[]}}
+window.cbSend=async x=>{const i=$i("cbT"),t=cleanText(x||i.value).slice(0,4000);if(!t||i.disabled)return;i.value="";i.disabled=true;msg("u",t);hist.push({r:"u",t});const w=msg("b","…");
+ try{const r=await agent(t);w.textContent=r.reply;hist.push({r:"b",t:r.reply});S.chat=hist.slice(-40);try{localStorage.setItem("cd_state",JSON.stringify(S))}catch(e){}r.actions.forEach(a=>{const m=act(a);if(m)msg("a","✓ "+m)})}
+ catch(e){w.textContent="Abhi kaam nahi ho paya ("+((e&&e.code)||e.message||"error")+"). Dobara try karo."}finally{i.disabled=false;i.focus()}};
+$i("cbT").addEventListener("keydown",e=>{if(e.key==="Enter")cbSend()});
+$i("cbQ").innerHTML=QUICK.map(q=>`<button class="sm">${q}</button>`).join("");
+$i("cbQ").onclick=e=>{if(e.target.tagName==="BUTTON")cbSend(e.target.textContent)};
+setInterval(()=>syncAuto(false),180000);
+setInterval(badge,60000);setTimeout(badge,1500);
+})();
+    </script>
+    <!-- ===== END CHATBOT ADD-ON v5 ===== -->
+
+    <!-- MERA DESK - CRM DATA CONNECTION -->
+    <script>
+        (() => {
+  "use strict";
+
+  const AI_URL =
+    "https://deskai.mohnish00027.workers.dev";
+
+  const originalFetch = window.fetch.bind(window);
+
+  function crmSnapshot(question) {
+    if (typeof LEADS === "undefined" ||
+        typeof L !== "function" ||
+        typeof today === "undefined") {
+      return null;
+    }
+
+    const now = new Date();
+
+    const records = LEADS.map(lead => ({
+      lead,
+      record: L(lead.id)
+    }));
+
+    const calledToday = records.filter(
+      x => x.record.day === today && x.record.res
+    );
+
+    const completedToday = calledToday.length;
+
+    const resultCounts = {
+      notAnswered: calledToday.filter(
+        x => x.record.res === "uthaya"
+      ).length,
+      busy: calledToday.filter(
+        x => x.record.res === "busy"
+      ).length,
+      notInterested: calledToday.filter(
+        x => x.record.res === "no"
+      ).length,
+      wrongNumber: calledToday.filter(
+        x => x.record.res === "wrong"
+      ).length
+    };
+
+    const due = records.filter(x => {
+      if (!x.record.fu || x.record.next === "won")
+        return false;
+
+      const date = new Date(x.record.fu);
+      return !isNaN(date) && date <= now;
+    });
+
+    const interested = records.filter(
+      x => ["interest", "quote", "demo"]
+        .includes(x.record.next)
+    );
+
+    const query = question.toLowerCase();
+
+    const matches = records.filter(x =>
+      String(x.lead.n).toLowerCase()
+        .includes(query) ||
+      (query.length >= 4 &&
+       String(x.lead.n).toLowerCase()
+         .split(" ").some(word =>
+           word.length >= 4 &&
+           query.includes(word)
+         ))
+    ).slice(0, 5);
+
+    return {
+      date: today,
+      totalLeads: LEADS.length,
+      callsRecordedToday: completedToday,
+      callResults: resultCounts,
+      dueFollowups: due.length,
+      interestedLeads: interested.length,
+      topDueLeads: due.slice(0, 8).map(
+        x => ({
+          company: x.lead.n,
+          followup: x.record.fu,
+          status: x.record.next || x.record.res
+        })
+      ),
+      matchedLeads: matches.map(x => ({
+        company: x.lead.n,
+        phone: x.lead.p,
+        city: x.lead.city || "Mumbai",
+        category: x.lead.c,
+        result: x.record.res || "Not recorded",
+        nextStep: x.record.next || "",
+        followup: x.record.fu || ""
+      })),
+      emailInformation:
+        "No verified sent-email count is provided by this CRM snapshot.",
+      notes:
+        "Calls recorded means leads with a call result saved today, not actual phone call history."
+    };
+  }
+
+  window.fetch = async function(input, init) {
+    const url =
+      typeof input === "string"
+        ? input
+        : input && input.url;
+
+    if (!url ||
+        url.replace(/\/+$/, "") !== AI_URL ||
+        !init ||
+        String(init.method || "GET").toUpperCase()
+          !== "POST") {
+      return originalFetch(input, init);
+    }
+
+    try {
+      const body = JSON.parse(init.body);
+      const question = String(body.message || "");
+      const crm = crmSnapshot(question);
+
+      if (crm) {
+        const q = question.toLowerCase();
+
+        // Exact answer from CRM for today's call count.
+        if (
+          /call|calling|dial|phone/.test(q) &&
+          /today|aaj|aj\b/.test(q) &&
+          /how many|kitne|count|number|total/.test(q)
+        ) {
+          return new Response(JSON.stringify({
+            reply:
+              "Bhai, aaj Genesis Calling Desk mein " +
+              crm.callsRecordedToday +
+              " leads par call results recorded hain.\n\n" +
+              "Uthaya nahi: " +
+              crm.callResults.notAnswered + "\n" +
+              "Busy: " + crm.callResults.busy + "\n" +
+              "Interested nahi: " +
+              crm.callResults.notInterested + "\n" +
+              "Wrong number: " +
+              crm.callResults.wrongNumber + "\n\n" +
+              "Ye website ke saved records hain, " +
+              "phone ki actual call history nahi."
+          }), {
+            status: 200,
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+        }
+
+        body.system = String(body.system || "") +
+          "\n\nIMPORTANT GENESIS CRM DATA:\n" +
+          JSON.stringify(crm) +
+          "\n\nUse CRM data when answering CRM questions." +
+          "\nNever invent calls, sent emails or updates." +
+          "\nThe CRM snapshot represents saved records." +
+          "\nIf email sent count is unknown, say unknown." +
+          "\nDo not claim access to Gmail or phone logs." +
+          "\nAnswer in the user's language.";
+      }
+
+      return originalFetch(input, {
+        ...init,
+        body: JSON.stringify(body)
+      });
+
+    } catch (error) {
+      console.error("CRM connection:", error);
+      return originalFetch(input, init);
+    }
+  };
+
+  console.log("Mera Desk CRM data bridge enabled");
+})();
+    </script>
+    <!-- END CRM CONNECTION -->
+
 </body>
+
 </html>
