@@ -1286,7 +1286,7 @@ function xlAgo(){if(!S.lastXl)return"Excel backup abhi tak nahi liya";const m=Ma
 let cloudDoc=null,cloudT=null,cloudMsg="",AI=null;const H={};
 function stamps(){Object.entries(S.leads).forEach(([id,o])=>{const{lt,...r}=o,j=JSON.stringify(r);if(H[id]!==j){o.lt=Date.now();if(S.me)o.by=S.me;const{lt:_a,...r2}=o;H[id]=JSON.stringify(r2)}})}
 function rehash(){Object.entries(S.leads).forEach(([id,o])=>{const{lt,...r}=o;H[id]=JSON.stringify(r)})}
-function tot(){const e=document.getElementById("tot");if(e&&window.lastTot)e.textContent=window.lastTot+(cloudMsg?" · "+cloudMsg:"")}
+function tot(){const e=document.getElementById("tot");if(e&&window.lastTot)e.textContent=window.lastTot+(cloudMsg?" · "+cloudMsg:"")+(window.sbLiveTxt?" · "+window.sbLiveTxt:"")}
 const LOCAL_KEYS=["pin","mkey","mailer","cloud","me","chat","name","target","unv","mine"];let cloudTry=0;
 function cloudPush(){if(!cloudDoc)return;clearTimeout(cloudT);cloudT=setTimeout(()=>{const o=JSON.parse(JSON.stringify(S));LOCAL_KEYS.forEach(k=>delete o[k]);
  cloudDoc.set(o).then(()=>{cloudTry=0;cloudMsg="☁ synced";tot()}).catch(e=>{
@@ -1398,7 +1398,7 @@ async function sbStart(){
 }
 /* ===== Phase 2: realtime claim lock + call log ===== */
 function sbOwn(o){return !sbUid||(sbMe&&sbMe.role==="admin")||o.by===sbUid}
-var sbUid=null,sbMap={},sbLocks={},sbNames={},sbMe=null,sbLockT=null,sbRt=null,sbPaintT=null;
+var sbUid=null,sbMap={},sbLocks={},sbNames={},sbMe=null,sbLockT=null,sbRt=null,sbPaintT=null,sbCh=null,sbLive=false,sbLastPoll=0;
 const SB_JS="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js";
 const sbToast=m=>{try{typeof toast==="function"?toast(m):alert(m)}catch(e){}};
 function sbJwtUid(){try{return JSON.parse(atob(sbAuth.access_token.split(".")[1].replace(/-/g,"+").replace(/_/g,"/"))).sub}catch(e){return null}}
@@ -1406,7 +1406,7 @@ const sbLk=k=>{const x=k&&sbLocks[k];return x&&x.by!==sbUid&&x.until>Date.now()?
 const sbTxt=x=>"🔒 "+(sbNames[x.by]||"Koi aur")+" is on this lead";
 function sbLockBadge(l){const x=sbLk(sbMap[l.id]);return '<span class="sbb tag" data-k="'+(x?x.by:"")+'" style="'+(x?"background:#5a2a2a;color:#ffb4b4":"display:none")+'">'+(x?esc(sbTxt(x)):"")+'</span>'}
 function sbPaint(){document.querySelectorAll("section.lead[data-lid]").forEach(sec=>{const b=sec.querySelector(".sbb");if(!b)return;const x=sbLk(sbMap[sec.dataset.lid]),k=x?x.by:"";if(b.dataset.k===k)return;b.dataset.k=k;
- if(x){b.style.cssText="background:#5a2a2a;color:#ffb4b4";b.textContent=sbTxt(x);sec.style.opacity=".65"}else{b.style.cssText="display:none";b.textContent="";sec.style.opacity=""}})}
+ if(x){b.style.cssText="background:#5a2a2a;color:#ffb4b4";b.textContent=sbTxt(x);sec.style.opacity=".65";sec.style.pointerEvents="none"}else{b.style.cssText="display:none";b.textContent="";sec.style.opacity="";sec.style.pointerEvents=""}})}
 async function sbLockInit(){
  try{
   sbUid=sbJwtUid();
@@ -1419,7 +1419,7 @@ async function sbLockInit(){
   pf.forEach(x=>{sbNames[x.id]=x.name||"User"});sbMe=pf.find(x=>x.id===sbUid)||null;
   if(sbMe&&String(sbMe.email||"").toLowerCase()==="mohnish.p@genesisinfoserve.com"){let c=0;Object.values(S.leads).forEach(o=>{if(!o.by&&(o.fu||o.res||o.next)){o.by=sbUid;c++}});if(c)save()}
   try{render()}catch(e){}
-  await sbLockPoll();clearInterval(sbLockT);sbLockT=setInterval(sbLockPoll,30000);clearInterval(sbPaintT);sbPaintT=setInterval(sbPaint,10000);
+  await sbLockPoll();clearInterval(sbLockT);sbLockT=setInterval(()=>{if(!sbLive||Date.now()-sbLastPoll>30000)sbLockPoll()},5000);clearInterval(sbPaintT);sbPaintT=setInterval(sbPaint,10000);
   sbRealtime()
  }catch(e){}
 }
@@ -1429,9 +1429,13 @@ async function sbRealtime(){
   if(sbRt)return;
   sbRt=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
   sbRt.realtime.setAuth(sbAuth.access_token);
-  sbRt.channel("lead_state_live").on("postgres_changes",{event:"*",schema:"public",table:"lead_state"},sbOnChange).subscribe(st=>{if(st==="SUBSCRIBED")sbToast("⚡ Live lock ON")})
- }catch(e){}
+  sbCh=sbRt.channel("lead-locks",{config:{private:true,broadcast:{self:false}}});
+  sbCh.on("broadcast",{event:"lock"},m=>sbOnBc(m.payload,true)).on("broadcast",{event:"unlock"},m=>sbOnBc(m.payload,false))
+   .subscribe(st=>{sbLive=(st==="SUBSCRIBED");window.sbLiveTxt=sbLive?"⚡ live":"⏳ lock slow";tot()})
+ }catch(e){window.sbLiveTxt="⏳ lock slow";tot()}
 }
+function sbSend(ev,k,until){try{if(sbCh&&sbLive)sbCh.send({type:"broadcast",event:ev,payload:{k:k,by:sbUid,name:sbNames[sbUid]||"",until:until||0}})}catch(e){}}
+function sbOnBc(p,on){if(!p||!p.k||p.by===sbUid)return;if(p.name)sbNames[p.by]=p.name;if(on)sbLocks[p.k]={by:p.by,until:p.until,t:Date.now()};else if(sbLocks[p.k]&&sbLocks[p.k].by===p.by)delete sbLocks[p.k];sbPaint()}
 function sbOnChange(p){
  const n=p.new&&p.new.lead_id?p.new:null,id=n?n.lead_id:(p.old&&p.old.lead_id);if(!id)return;
  if(n&&n.locked_by&&Date.parse(n.locked_until)>Date.now())sbLocks[id]={by:n.locked_by,until:Date.parse(n.locked_until)};else delete sbLocks[id];
@@ -1439,27 +1443,28 @@ function sbOnChange(p){
 }
 async function sbLockPoll(){
  try{const r=await sbFetch("/rest/v1/lead_state?select=lead_id,locked_by,locked_until&locked_by=not.is.null&locked_until=gt."+encodeURIComponent(new Date().toISOString()));
-  if(!r.ok)return;const a=await r.json(),n={};a.forEach(x=>{n[x.lead_id]={by:x.locked_by,until:Date.parse(x.locked_until)}});sbLocks=n;sbPaint()}catch(e){}
+  if(!r.ok)return;const a=await r.json(),n={};a.forEach(x=>{n[x.lead_id]={by:x.locked_by,until:Date.parse(x.locked_until)}});Object.entries(sbLocks).forEach(([k,v])=>{if(!n[k]&&v.t&&Date.now()-v.t<4000)n[k]=v});sbLastPoll=Date.now();sbLocks=n;sbPaint()}catch(e){}
 }
 async function sbClaim(appId){
  const k=sbMap[appId];if(!k)return true;if(sbLk(k))return false;
  const m=sbLocks[k];if(m&&m.by===sbUid&&m.until-Date.now()>60000)return true;
- sbLocks[k]={by:sbUid,until:Date.now()+300000};
+ const un=Date.now()+300000;sbLocks[k]={by:sbUid,until:un,t:Date.now()};sbSend("lock",k,un);
  try{const r=await sbFetch("/rest/v1/rpc/claim_lead",{method:"POST",body:JSON.stringify({p_lead:k})});if(!r.ok)return true;
-  const ok=await r.json();if(!ok){delete sbLocks[k];sbLockPoll()}return ok}catch(e){return true}
+  const ok=await r.json();if(!ok){delete sbLocks[k];sbSend("unlock",k);sbLockPoll()}return ok}catch(e){return true}
 }
 async function sbCallDone(appId){
- const k=sbMap[appId];if(!k||!sbUid)return;const o=L(appId);
+ const k=sbMap[appId];if(!k||!sbUid)return;const o=L(appId);sbSend("unlock",k);
  try{await sbFetch("/rest/v1/call_logs",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({lead_id:k,user_id:sbUid,result:o.res||null,next_step:o.next||null,note:o.note||null})});
   await sbFetch("/rest/v1/rpc/release_lead",{method:"POST",body:JSON.stringify({p_lead:k})});delete sbLocks[k]}catch(e){}
 }
-document.addEventListener("click",e=>{
+function sbTouch(e){
  const sec=e.target.closest&&e.target.closest("section.lead[data-lid]");if(!sec||!sbUid)return;
- if(!e.target.closest('a[href^="tel:"]')&&!e.target.closest("button.o"))return;
+ if(!e.target.closest("a,button,input,textarea,select"))return;
  const id=sec.dataset.lid,x=sbLk(sbMap[id]);
- if(x){e.preventDefault();e.stopImmediatePropagation();sbToast(sbTxt(x));return}
+ if(x){e.preventDefault();e.stopImmediatePropagation();if(e.type!=="focusin")sbToast(sbTxt(x));if(e.target.blur)e.target.blur();return}
  sbClaim(id).then(ok=>{if(!ok)sbToast("🔒 Ye lead abhi kisi aur ne le li")})
-},true);
+}
+["pointerdown","click","focusin"].forEach(t=>document.addEventListener(t,t==="click"?(e=>{const sec=e.target.closest&&e.target.closest("section.lead[data-lid]");if(!sec||!sbUid)return;const x=sbLk(sbMap[sec.dataset.lid]);if(x){e.preventDefault();e.stopImmediatePropagation()}}):sbTouch,true));
 (()=>{const so=window.setOpt;if(typeof so!=="function")return;window.setOpt=function(id,key,v){if(sbUid&&(key==="res"||key==="next"))L(id).by=sbUid;const r=so.apply(this,arguments);if(key==="res"&&L(id).res)sbCallDone(id);return r}})();
 (async()=>{try{if(!window.claude||!claude.use){setTimeout(()=>gsInit(false),500);sbInit();return}
  claude.use("sample").then(s=>{if(s){AI=s;render()}}).catch(()=>{});
