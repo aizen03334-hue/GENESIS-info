@@ -1286,6 +1286,20 @@ function xlLeadsOne(list,base,label){
   return[i+1,l.n,l.c||"",l.t||"",l.city||"Mumbai",l.a||"",l.p||"",o.email||l.e||"",o.cn||l.cn||"",rn[o.res]||"",nn[o.next]||"",(o.fu||"").replace("T"," "),o.day||"",PR(l).join(", "),o.qs||"",o.qu||"",isNaN(amt)?"":amt,o.note||"",l.x||"",(o.mails||[]).length||"",(o.mails||[]).map(m=>fdt(m.at)+(m.sub?" | "+m.sub:"")).join("\n"),fdt(o.lt),o.by||""]});
  dlx(base+"_"+stamp()+".xlsx",[{name:"Leads",widths:W,rows:[H,...rows]}]);
  toast(rows.length+" "+label+" ek Excel file mein save ho gaye")}
+function fuList(){return LEADS.filter(x=>{const o=L(x.id);return sbOwn(o)&&(o.fu||o.res==="busy"||(o.next&&o.next!=="won"))})}
+function fuBackup(){const items={};fuList().forEach(x=>{items[x.id]=Object.assign({n:x.n,p:x.p},L(x.id))});const c=Object.keys(items).length;
+ if(!c){toast("Follow-up backup ke liye kuch nahi hai");return}
+ dl("followups-backup-"+stamp()+".json",JSON.stringify({type:"followups",at:new Date().toISOString(),by:(sbMe&&sbMe.email)||S.name||"",items:items},null,1),"application/json");toast(c+" follow-ups ka backup ho gaya")}
+function fuRestore(inp){const f=inp.files[0];inp.value="";if(!f)return;
+ f.text().then(t=>{let d;try{d=JSON.parse(t)}catch(e){}
+  if(!d||d.type!=="followups"||!d.items){toast("Ye follow-up backup file nahi hai");return}
+  const ks=Object.keys(d.items);if(!confirm(ks.length+" follow-ups restore karne hain? In leads ka follow-up data backup wale se badal jayega."))return;
+  let ok=0,miss=0;const last10=v=>digits(v||"").slice(-10);
+  ks.forEach(k=>{const it=d.items[k];let l=LEADS.find(x=>String(x.id)===String(k)&&x.n===it.n);
+   if(!l&&last10(it.p).length===10)l=LEADS.find(x=>last10(x.p)===last10(it.p));
+   if(!l){miss++;return}
+   const v=Object.assign({},it);delete v.n;delete v.p;S.leads[l.id]=v;ok++});
+  save();render();toast(ok+" follow-ups restore hue"+(miss?", "+miss+" lead nahi mili":""))}).catch(()=>toast("File padh nahi paaye"))}
 function xlFollow(){const l=LEADS.filter(x=>{const o=L(x.id);return sbOwn(o)&&(o.fu||o.res==="busy"||(o.next&&o.next!=="won"))}).sort((a,b)=>(L(a.id).fu||"9").localeCompare(L(b.id).fu||"9"));
  if(!l.length){toast("Abhi koi follow-up nahi");return}xlLeadsOne(l,"follow-ups","follow-up leads")}
 function xlAaj(){const l=filtered().filter(x=>{const o=L(x.id);return !o.res||o.day===today||o.res==="busy"});
@@ -1543,7 +1557,7 @@ function render(){
   h+=`<div class="filters">${cats.map(c=>`<button class="chip ${cat===c?"on":""}" onclick="cat='${c}';render()">${c}</button>`).join("")}
   <select onchange="area=this.value;render()">${areas.map(a=>`<option ${a===area?"selected":""}>${a}</option>`).join("")}</select>
   <select onchange="prod=this.value;render()"><option value="Sab products">Sab products</option><option value="__parts" ${prod==="__parts"?"selected":""}>Computer Parts (sab)</option>${GROUPS.map(g=>`<optgroup label="${GLBL[g]}">${ALLP.filter(p=>p[0]===g).map(p=>`<option ${p[1]===prod?"selected":""}>${esc(p[1])}</option>`).join("")}</optgroup>`).join("")}</select>
-  <input type="text" id="q" placeholder="Search naam / phone" value="${esc(q)}" oninput="qIn(this.value)" style="width:150px"><button class="sm" onclick="addForm()">+ Naya lead</button><button class="sm" onclick="xlList()">Excel (is list)</button>${tab==="fu"?`<button class="sm" style="outline:2px solid var(--teal)" onclick="xlFollow()">⬇ Sab follow-ups ki details (Excel)</button>`:""}${tab==="aaj"?`<button class="sm" style="outline:2px solid var(--teal)" onclick="xlAaj()">⬇ Aaj ki list ki details (Excel)</button>`:""}<label class="me">Aapka naam <input type="text" value="${esc(S.name)}" placeholder="script/email mein aayega" onchange="S.name=this.value;save();render()"></label><label class="me" style="margin-left:0">Aapka phone <input type="text" value="${esc(S.phone||"")}" placeholder="email mein aayega" onchange="S.phone=this.value;save();render()"></label></div>`;
+  <input type="text" id="q" placeholder="Search naam / phone" value="${esc(q)}" oninput="qIn(this.value)" style="width:150px"><button class="sm" onclick="addForm()">+ Naya lead</button><button class="sm" onclick="xlList()">Excel (is list)</button>${tab==="fu"?`<button class="sm" style="outline:2px solid var(--teal)" onclick="xlFollow()">⬇ Sab follow-ups ki details (Excel)</button><button class="sm" style="outline:2px solid var(--teal)" onclick="fuBackup()">💾 Follow-up backup</button><label class="sm" style="display:inline-block">♻ Follow-up restore<input type="file" accept=".json" hidden onchange="fuRestore(this)"></label>`:""}${tab==="aaj"?`<button class="sm" style="outline:2px solid var(--teal)" onclick="xlAaj()">⬇ Aaj ki list ki details (Excel)</button>`:""}<label class="me">Aapka naam <input type="text" value="${esc(S.name)}" placeholder="script/email mein aayega" onchange="S.name=this.value;save();render()"></label><label class="me" style="margin-left:0">Aapka phone <input type="text" value="${esc(S.phone||"")}" placeholder="email mein aayega" onchange="S.phone=this.value;save();render()"></label></div>`;
   let list=filtered();
   if(tab==="aaj")list=list.filter(l=>{const o=L(l.id);return !o.res||o.day===today||o.res==="busy"});
   if(tab==="fu")list=fu.filter(l=>list.includes(l));
