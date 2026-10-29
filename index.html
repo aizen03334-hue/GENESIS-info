@@ -1492,6 +1492,11 @@ ${prodRow(l)}<textarea placeholder="Note: kisse baat hui, kya chahiye" oninput="
 const RANK=l=>({H:0,N:1,D:2,S:3})[KIND(l)];
 function filtered(){return filtered0().sort((a,b)=>RANK(a)-RANK(b))}
 function filtered0(){const t=q.trim().toLowerCase();return LEADS.filter(l=>(!S.unv||vState(l)==="u")&&(!S.mine||L(l.id).as===S.me)&&(cat==="Sab"||l.c===cat)&&(prod==="Sab products"||(prod==="__parts"?PR(l).some(x=>PARTS.includes(x)):PR(l).includes(prod)))&&(area==="Sab shehar"||(l.city||"Mumbai")===area)&&(!t||(l.n+" "+l.a+" "+(l.city||"")+" "+l.p+" "+(L(l.id).cn||"")).toLowerCase().includes(t)))}
+var pgN=30,pgK="";
+function sbPage(list){const k=[tab,cat,area,prod,q,list.length].join("|");if(k!==pgK){pgK=k;pgN=30}
+ let h=list.slice(0,pgN).map(card).join("");
+ if(list.length>pgN)h+='<button class="sm" style="width:100%;margin:10px 0" onclick="pgN+=30;render()">⬇ Aur dikhao ('+(list.length-pgN)+' baaki)</button>';
+ return h}
 function render(){
  const all=LEADS,calls=all.filter(l=>L(l.id).day===today).length;
  $("#done").textContent=calls;{const hw=all.filter(l=>["H","N"].includes(KIND(l))).length,sw=all.filter(l=>KIND(l)==="D").length,sc=all.filter(l=>KIND(l)==="S").length;window.lastTot="Total leads: "+all.length+" · Hardware "+hw+" · Design "+sw+" · Security "+sc+" · "+xlAgo();tot()}$("#tgt").textContent=S.target;$("#fill").style.width=Math.min(100,calls/S.target*100)+"%";
@@ -1509,7 +1514,7 @@ function render(){
   let list=filtered();
   if(tab==="aaj")list=list.filter(l=>{const o=L(l.id);return !o.res||o.day===today||o.res==="busy"});
   if(tab==="fu")list=fu.filter(l=>list.includes(l));
-  h+=list.length?list.map(card).join(""):`<div class="empty">${tab==="fu"?"Abhi koi follow-up nahi.":"Is filter mein koi lead nahi."}</div>`;
+  h+=list.length?sbPage(list):`<div class="empty">${tab==="fu"?"Abhi koi follow-up nahi.":"Is filter mein koi lead nahi."}</div>`;
  }
  if(tab==="prod")h=GROUPS.map(g=>`<div class="lbl" style="margin-top:18px;font-size:13px">${GLBL[g]}</div>`+ALLP.filter(p=>p[0]===g).map(([,a,b])=>`<div class="box"><b>${a}</b><div class="sub">${b}</div></div>`).join("")).join("");
  if(tab==="rep"){
