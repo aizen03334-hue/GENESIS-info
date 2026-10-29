@@ -1353,7 +1353,7 @@ function copyRich(id){logMail(id);const r=richMail(LEADS.find(x=>x.id===id));try
 const SB_URL="https://quzwwibuahjozskhzkvi.supabase.co",SB_KEY="sb_publishable_7kUaJAS6Fqkm26fjmr3H_g_uK8The9w";
 let sbAuth=null,sbPoll=null;try{sbAuth=JSON.parse(localStorage.getItem("sb_auth")||"null")}catch(e){}
 const sbBtn=()=>{const b=document.getElementById("sbOut");if(b)b.style.display=sbAuth?"inline-block":"none"};
-const sbSave=a=>{sbAuth=a;try{a?localStorage.setItem("sb_auth",JSON.stringify(a)):localStorage.removeItem("sb_auth")}catch(e){}sbBtn()};
+const sbSave=a=>{sbAuth=a;try{a?localStorage.setItem("sb_auth",JSON.stringify(a)):localStorage.removeItem("sb_auth")}catch(e){}sbBtn();try{if(a&&sbRt)sbRt.realtime.setAuth(a.access_token)}catch(e){}};
 const sbTok=j=>({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:Math.floor(Date.now()/1000)+(j.expires_in||3600)});
 async function sbEnsure(){
  if(!sbAuth)throw new Error("login");
@@ -1396,11 +1396,16 @@ async function sbStart(){
  sbLockInit();clearInterval(sbPoll);
  sbPoll=setInterval(async()=>{if(!cloudDoc)return;try{const sn=await cloudDoc.get();if(sn.exists&&mergeRemote(sn.data())&&idle())render()}catch(e){if(String(e.message)==="login"){cloudDoc=null;clearInterval(sbPoll);cloudMsg="🔐 login chahiye";tot();sbLogin("Session khatam, dobara login karo")}}},60000)
 }
-/* ===== Phase 2: claim lock + call log ===== */
-var sbUid=null,sbMap={},sbLocks={},sbNames={},sbMe=null,sbLockT=null;
+/* ===== Phase 2: realtime claim lock + call log ===== */
+var sbUid=null,sbMap={},sbLocks={},sbNames={},sbMe=null,sbLockT=null,sbRt=null,sbPaintT=null;
+const SB_JS="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js";
 const sbToast=m=>{try{typeof toast==="function"?toast(m):alert(m)}catch(e){}};
 function sbJwtUid(){try{return JSON.parse(atob(sbAuth.access_token.split(".")[1].replace(/-/g,"+").replace(/_/g,"/"))).sub}catch(e){return null}}
-function sbLockBadge(l){const k=sbMap[l.id],x=k&&sbLocks[k];if(!x||x.by===sbUid)return"";return '<span class="tag" style="background:#5a2a2a;color:#ffb4b4">🔒 '+esc(sbNames[x.by]||"Koi aur")+' call kar raha hai</span>'}
+const sbLk=k=>{const x=k&&sbLocks[k];return x&&x.by!==sbUid&&x.until>Date.now()?x:null};
+const sbTxt=x=>"🔒 "+(sbNames[x.by]||"Koi aur")+" is on this lead";
+function sbLockBadge(l){const x=sbLk(sbMap[l.id]);return '<span class="sbb tag" data-k="'+(x?x.by:"")+'" style="'+(x?"background:#5a2a2a;color:#ffb4b4":"display:none")+'">'+(x?esc(sbTxt(x)):"")+'</span>'}
+function sbPaint(){document.querySelectorAll("section.lead[data-lid]").forEach(sec=>{const b=sec.querySelector(".sbb");if(!b)return;const x=sbLk(sbMap[sec.dataset.lid]),k=x?x.by:"";if(b.dataset.k===k)return;b.dataset.k=k;
+ if(x){b.style.cssText="background:#5a2a2a;color:#ffb4b4";b.textContent=sbTxt(x);sec.style.opacity=".65"}else{b.style.cssText="display:none";b.textContent="";sec.style.opacity=""}})}
 async function sbLockInit(){
  try{
   sbUid=sbJwtUid();
@@ -1411,31 +1416,46 @@ async function sbLockInit(){
   const by={};dl.forEach(r=>{by[key(r.name,r.phone)]=r.id});
   sbMap={};LEADS.forEach(l=>{const id=by[key(l.n,l.p)];if(id)sbMap[l.id]=id});
   pf.forEach(x=>{sbNames[x.id]=x.name||"User"});sbMe=pf.find(x=>x.id===sbUid)||null;
-  await sbLockPoll();clearInterval(sbLockT);sbLockT=setInterval(sbLockPoll,20000)
+  await sbLockPoll();clearInterval(sbLockT);sbLockT=setInterval(sbLockPoll,30000);clearInterval(sbPaintT);sbPaintT=setInterval(sbPaint,10000);
+  sbRealtime()
  }catch(e){}
 }
+async function sbRealtime(){
+ try{
+  if(!window.supabase)await new Promise((ok,no)=>{const s=document.createElement("script");s.src=SB_JS;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+  if(sbRt)return;
+  sbRt=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
+  sbRt.realtime.setAuth(sbAuth.access_token);
+  sbRt.channel("lead_state_live").on("postgres_changes",{event:"*",schema:"public",table:"lead_state"},sbOnChange).subscribe(st=>{if(st==="SUBSCRIBED")sbToast("⚡ Live lock ON")})
+ }catch(e){}
+}
+function sbOnChange(p){
+ const n=p.new&&p.new.lead_id?p.new:null,id=n?n.lead_id:(p.old&&p.old.lead_id);if(!id)return;
+ if(n&&n.locked_by&&Date.parse(n.locked_until)>Date.now())sbLocks[id]={by:n.locked_by,until:Date.parse(n.locked_until)};else delete sbLocks[id];
+ sbPaint()
+}
 async function sbLockPoll(){
- try{const r=await sbFetch("/rest/v1/lead_state?select=lead_id,locked_by&locked_by=not.is.null&locked_until=gt."+encodeURIComponent(new Date().toISOString()));
-  if(!r.ok)return;const a=await r.json(),n={};a.forEach(x=>{n[x.lead_id]={by:x.locked_by}});
-  const ch=JSON.stringify(n)!==JSON.stringify(sbLocks);sbLocks=n;if(ch&&idle())render()}catch(e){}
+ try{const r=await sbFetch("/rest/v1/lead_state?select=lead_id,locked_by,locked_until&locked_by=not.is.null&locked_until=gt."+encodeURIComponent(new Date().toISOString()));
+  if(!r.ok)return;const a=await r.json(),n={};a.forEach(x=>{n[x.lead_id]={by:x.locked_by,until:Date.parse(x.locked_until)}});sbLocks=n;sbPaint()}catch(e){}
 }
 async function sbClaim(appId){
- const k=sbMap[appId];if(!k)return true;const x=sbLocks[k];if(x&&x.by!==sbUid)return false;
+ const k=sbMap[appId];if(!k)return true;if(sbLk(k))return false;
+ const m=sbLocks[k];if(m&&m.by===sbUid&&m.until-Date.now()>60000)return true;
+ sbLocks[k]={by:sbUid,until:Date.now()+300000};
  try{const r=await sbFetch("/rest/v1/rpc/claim_lead",{method:"POST",body:JSON.stringify({p_lead:k})});if(!r.ok)return true;
-  const ok=await r.json();if(ok)sbLocks[k]={by:sbUid};else sbLockPoll();return ok}catch(e){return true}
+  const ok=await r.json();if(!ok){delete sbLocks[k];sbLockPoll()}return ok}catch(e){return true}
 }
 async function sbCallDone(appId){
  const k=sbMap[appId];if(!k||!sbUid)return;const o=L(appId);
  try{await sbFetch("/rest/v1/call_logs",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({lead_id:k,user_id:sbUid,result:o.res||null,next_step:o.next||null,note:o.note||null})});
   await sbFetch("/rest/v1/rpc/release_lead",{method:"POST",body:JSON.stringify({p_lead:k})});delete sbLocks[k]}catch(e){}
 }
-document.addEventListener("click",async e=>{
+document.addEventListener("click",e=>{
  const sec=e.target.closest&&e.target.closest("section.lead[data-lid]");if(!sec||!sbUid)return;
- const a=e.target.closest('a[href^="tel:"]'),b=e.target.closest("button.o");if(!a&&!b)return;
- const id=sec.dataset.lid,k=sbMap[id],x=k&&sbLocks[k];
- if(x&&x.by!==sbUid){e.preventDefault();e.stopImmediatePropagation();sbToast("🔒 "+(sbNames[x.by]||"Koi aur")+" is lead pe kaam kar raha hai");return}
- if(a){e.preventDefault();const ok=await sbClaim(id);if(ok)location.href=a.href;else sbToast("🔒 Ye lead abhi kisi aur ne le li");return}
- sbClaim(id)
+ if(!e.target.closest('a[href^="tel:"]')&&!e.target.closest("button.o"))return;
+ const id=sec.dataset.lid,x=sbLk(sbMap[id]);
+ if(x){e.preventDefault();e.stopImmediatePropagation();sbToast(sbTxt(x));return}
+ sbClaim(id).then(ok=>{if(!ok)sbToast("🔒 Ye lead abhi kisi aur ne le li")})
 },true);
 (()=>{const so=window.setOpt;if(typeof so!=="function")return;window.setOpt=function(id,key,v){const r=so.apply(this,arguments);if(key==="res"&&L(id).res)sbCallDone(id);return r}})();
 (async()=>{try{if(!window.claude||!claude.use){setTimeout(()=>gsInit(false),500);sbInit();return}
