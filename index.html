@@ -1343,17 +1343,45 @@ function filtBar(){return `<div style="margin-bottom:8px;display:flex;gap:6px;fl
 const unB=c=>{const n=c.codePointAt(0);return n>=0x1D5D4&&n<=0x1D5ED?String.fromCharCode(65+n-0x1D5D4):n>=0x1D5EE&&n<=0x1D607?String.fromCharCode(97+n-0x1D5EE):n>=0x1D7EC&&n<=0x1D7F5?String.fromCharCode(48+n-0x1D7EC):null};
 function richMail(l){const m=mailParts(l);let h="",pl="",ib=false;for(const c of m.body){const u=unB(c);if(u!==null){if(!ib){h+="<b>";ib=true}h+=esc(u);pl+=u}else{if(ib){h+="</b>";ib=false}h+=c==="\n"?"<br>":esc(c);pl+=c}}if(ib)h+="</b>";return{html:'<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt">'+h+"</div>",plain:pl}}
 function copyRich(id){logMail(id);const r=richMail(LEADS.find(x=>x.id===id));try{navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([r.html],{type:"text/html"}),"text/plain":new Blob([r.plain],{type:"text/plain"})})]).then(()=>toast("Bold mail copy: Outlook/Gmail mein Ctrl+V karo"))}catch(e){navigator.clipboard.writeText(r.plain);toast("Plain mail copy hua")}}
-/* ===== Supabase cloud sync (calling_state table) ===== */
+/* ===== Supabase cloud sync (calling_state table, login required) ===== */
 const SB_URL="https://quzwwibuahjozskhzkvi.supabase.co",SB_KEY="sb_publishable_7kUaJAS6Fqkm26fjmr3H_g_uK8The9w";
-const sbH={apikey:SB_KEY,"Content-Type":"application/json"};
-async function sbInit(){
+let sbAuth=null,sbPoll=null;try{sbAuth=JSON.parse(localStorage.getItem("sb_auth")||"null")}catch(e){}
+const sbSave=a=>{sbAuth=a;try{a?localStorage.setItem("sb_auth",JSON.stringify(a)):localStorage.removeItem("sb_auth")}catch(e){}};
+const sbTok=j=>({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:Math.floor(Date.now()/1000)+(j.expires_in||3600)});
+async function sbEnsure(){
+ if(!sbAuth)throw new Error("login");
+ if(sbAuth.expires_at-Math.floor(Date.now()/1000)>60)return;
+ const r=await fetch(SB_URL+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{apikey:SB_KEY,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:sbAuth.refresh_token})});
+ if(!r.ok){sbSave(null);throw new Error("login")}
+ sbSave(sbTok(await r.json()))
+}
+async function sbFetch(path,opt){
+ await sbEnsure();
+ const r=await fetch(SB_URL+path,{cache:"no-store",...opt,headers:{apikey:SB_KEY,Authorization:"Bearer "+sbAuth.access_token,"Content-Type":"application/json",...((opt||{}).headers||{})}});
+ if(r.status===401){sbSave(null);throw new Error("login")}
+ return r
+}
+function sbLogin(msg){showM('<h3>🔐 Login</h3><p class="sub">'+esc(msg||"Cloud sync ke liye login karo")+'</p><p><input type="email" id="sb_e" placeholder="Email" style="width:100%" autocomplete="username"></p><p><input type="password" id="sb_p" placeholder="Password" style="width:100%" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')sbDoLogin()"></p><button class="sm" onclick="sbDoLogin()">Login</button> <button class="sm" onclick="closeM()">Baad mein</button>')}
+async function sbDoLogin(){
+ const e=document.getElementById("sb_e").value.trim(),p=document.getElementById("sb_p").value;
+ if(!e||!p){sbLogin("Email aur password dono daalo");return}
+ try{
+  const r=await fetch(SB_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:SB_KEY,"Content-Type":"application/json"},body:JSON.stringify({email:e,password:p})});
+  if(!r.ok){sbLogin("Email ya password galat hai");return}
+  sbSave(sbTok(await r.json()));closeM();sbStart()
+ }catch(x){sbLogin("Network error, dobara try karo")}
+}
+function sbLogout(){sbSave(null);cloudDoc=null;clearInterval(sbPoll);cloudMsg="🔐 logout";tot();toast("Logout ho gaya")}
+function sbInit(){if(!sbAuth){cloudMsg="🔐 login chahiye";tot();sbLogin();return}sbStart()}
+async function sbStart(){
  cloudDoc={
-  get:async()=>{const r=await fetch(SB_URL+"/rest/v1/calling_state?id=eq.main&select=data",{headers:sbH,cache:"no-store"});if(!r.ok)throw new Error("get "+r.status);const a=await r.json();return a.length?{exists:true,data:()=>a[0].data}:{exists:false}},
-  set:async d=>{const r=await fetch(SB_URL+"/rest/v1/calling_state?on_conflict=id",{method:"POST",headers:{...sbH,Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({id:"main",data:d,updated_at:new Date().toISOString()})});if(!r.ok)throw new Error("set "+r.status)}
+  get:async()=>{const r=await sbFetch("/rest/v1/calling_state?id=eq.main&select=data");if(!r.ok)throw new Error("get "+r.status);const a=await r.json();return a.length?{exists:true,data:()=>a[0].data}:{exists:false}},
+  set:async d=>{const r=await sbFetch("/rest/v1/calling_state?on_conflict=id",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({id:"main",data:d,updated_at:new Date().toISOString()})});if(!r.ok)throw new Error("set "+r.status)}
  };
  try{const sn=await cloudDoc.get();if(sn.exists&&mergeRemote(sn.data()))render();cloudMsg="☁ Supabase sync ON";tot();cloudPush()}
- catch(e){cloudMsg="☁ Supabase error";tot();return}
- setInterval(async()=>{try{const sn=await cloudDoc.get();if(sn.exists&&mergeRemote(sn.data())&&idle())render()}catch(e){}},60000)
+ catch(e){cloudDoc=null;if(String(e.message)==="login"){cloudMsg="🔐 login chahiye";tot();sbLogin("Session khatam, dobara login karo")}else{cloudMsg="☁ Supabase error";tot()}return}
+ clearInterval(sbPoll);
+ sbPoll=setInterval(async()=>{if(!cloudDoc)return;try{const sn=await cloudDoc.get();if(sn.exists&&mergeRemote(sn.data())&&idle())render()}catch(e){if(String(e.message)==="login"){cloudDoc=null;clearInterval(sbPoll);cloudMsg="🔐 login chahiye";tot();sbLogin("Session khatam, dobara login karo")}}},60000)
 }
 (async()=>{try{if(!window.claude||!claude.use){setTimeout(()=>gsInit(false),500);sbInit();return}
  claude.use("sample").then(s=>{if(s){AI=s;render()}}).catch(()=>{});
