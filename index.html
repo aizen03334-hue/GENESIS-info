@@ -1187,9 +1187,9 @@ function extraRow(l){const o=L(l.id),due=o.fu&&new Date(o.fu)<=new Date();
  return `<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center"><input type="text" class="em" style="flex:1;min-width:140px;margin:0" placeholder="Contact person (jaise Mr. Shah)" value="${esc(o.cn||"")}" onchange="L(${l.id}).cn=this.value.trim();save();render()"><label class="sub" style="${due?"color:var(--red);font-weight:700":""}">Follow-up${due?" (due)":""} <input type="datetime-local" value="${esc(o.fu||"")}" onchange="L(${l.id}).fu=this.value;if(window.sbUid)L(${l.id}).by=sbUid;save();render()"></label>${o.fu?`<button class="sm" onclick="L(${l.id}).fu='';save();render()">✕ Date hatao</button>`:""}${calLink(l)}${assignSel(l)}</div><div style="margin-top:6px"><input type="text" class="em" style="width:100%;margin:0" placeholder="Aur numbers (website wale mobile/direct), comma se alag karo" value="${esc(L(l.id).px||"")}" onchange="L(${l.id}).px=this.value.trim();save();render()"></div>`
  +(["quote","demo","won"].includes(o.next)?`<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">${qi("qs","Quote: kaun sa software","1fr").replace("width:1fr","flex:1;min-width:140px")}${qi("qu","Users","70px")}${qi("qa","Amount Rs","100px")}</div>`:"")}
 function qIn(v){q=v;render();const e=document.getElementById("q");if(e){e.focus();e.setSelectionRange(v.length,v.length)}}
-function addLeads(arr){let add=0,dup=0;arr.forEach(x=>{if(x.p&&!okNum(x.p)){dup++;return}const d=digits(x.p||"").slice(-10);if(d&&LEADS.some(l=>digits(l.p).slice(-10)===d)){dup++;return}const id=Math.max(...LEADS.map(l=>l.id))+1;const lead={id,n:x.n,a:x.a||"",city:x.city||"Mumbai",t:x.t||"",p:x.p||"",c:x.c||"Design software"};LEADS.push(lead);(S.custom=S.custom||[]).push(lead);if(x.e)L(id).email=x.e;if(x.cn)L(id).cn=x.cn;add++});save();render();return {add,dup}}
+function addLeads(arr){let add=0,dup=0;arr.forEach(x=>{if(x.p&&!okNum(x.p)){dup++;return}const d=digits(x.p||"").slice(-10);if(d&&LEADS.some(l=>digits(l.p).slice(-10)===d)){dup++;return}const id=Math.max(...LEADS.map(l=>l.id))+1;const lead={id,n:x.n,a:x.a||"",city:x.city||"Mumbai",t:x.t||"",p:x.p||"",c:x.c||"Design software",at:Date.now()};LEADS.push(lead);(S.custom=S.custom||[]).push(lead);if(x.e)L(id).email=x.e;if(x.cn)L(id).cn=x.cn;add++});save();render();return {add,dup}}
 function addForm(){showM(`<h3>Naya lead</h3>`+[["n","Company naam"],["p","Phone"],["e","Email"],["cn","Contact person"],["city","Shehar"],["a","Area"],["t","Type (Architect, CA firm...)"]].map(([k,t])=>`<p><input type="text" id="nf_${k}" placeholder="${t}" style="width:100%"></p>`).join("")+`<p><select id="nf_c" style="width:100%"><option>Design software</option><option>Security</option><option>IT Hardware</option><option>Networking &amp; CCTV</option></select></p><button class="sm" onclick="saveLead()">Save</button> <button class="sm" onclick="closeM()">Band karo</button>`)}
-function saveLead(){const g=k=>document.getElementById("nf_"+k).value.trim();if(!g("n")){alert("Company naam daalo");return}const r=addLeads([{n:g("n"),p:g("p"),e:g("e"),cn:g("cn"),city:g("city"),a:g("a"),t:g("t"),c:g("c")}]);closeM();alert(r.dup?"Ye number pehle se list mein hai.":"Lead jud gaya.")}
+function saveLead(){const g=k=>document.getElementById("nf_"+k).value.trim();if(!g("n")){alert("Company naam daalo");return}const r=addLeads([{n:g("n"),p:g("p"),e:g("e"),cn:g("cn"),city:g("city"),a:g("a"),t:g("t"),c:g("c")}]);closeM();newSeen();alert(r.dup?"Ye number pehle se list mein hai.":"Lead jud gaya.")}
 function dl(name,txt,type){saveFile(name,txt,type)}
 function csvParse(t){const rows=[];let r=[],f="",qt=false;for(let i=0;i<t.length;i++){const c=t[i];if(qt){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else qt=false}else f+=c}else if(c=='"')qt=true;else if(c==","){r.push(f);f=""}else if(c=="\n"){r.push(f);rows.push(r);r=[];f=""}else if(c!="\r")f+=c}if(f||r.length){r.push(f);rows.push(r)}return rows}
 function csvOut(){const H=["Company","Area","City","Type","Category","Phone","Email","Contact person","Result","Next step","Follow-up","Quote software","Users","Amount","Note","Products"];const rn=Object.fromEntries(RES.map(x=>[x[0],x[1]])),nn=Object.fromEntries(NXT.map(x=>[x[0],x[1]]));const rows=LEADS.map(l=>{const o=L(l.id);return [l.n,l.a,l.city||"Mumbai",l.t,l.c,l.p,o.email,o.cn,rn[o.res],nn[o.next],o.fu,o.qs,o.qu,o.qa,o.note,PR(l).join("; ")]});dl("calling-leads.csv","\ufeff"+[H,...rows].map(r=>r.map(v=>'"'+String(v||"").replace(/"/g,'""')+'"').join(",")).join("\n"),"text/csv")}
@@ -1432,8 +1432,20 @@ async function sbStart(){
 }
 </script>
 <script>
+/* ===== Naye leads popup (Aaj ki list) ===== */
+function newKey(){return "cd_seen_new_"+(window.sbUid||"x")}
+function newSeen(){try{localStorage.setItem(newKey(),String(Date.now()))}catch(e){}}
+function newLeads(){let seen=0;try{seen=Number(localStorage.getItem(newKey()))||0}catch(e){}
+ if(!seen){newSeen();return[]}return LEADS.filter(l=>l.at&&l.at>seen)}
+function newPopup(){try{
+ if(tab!=="aaj")return;const m=document.getElementById("modal");if(m&&m.classList.contains("show"))return;
+ const a=newLeads();if(!a.length)return;newSeen();
+ const by={};a.forEach(l=>by[l.c]=(by[l.c]||0)+1);const rfq=a.filter(l=>/^rfq/i.test(l.t||"")).length;
+ showM('<h3>🆕 '+a.length+' naye leads aaye</h3><p class="sub">'+Object.entries(by).map(([k,v])=>esc(k)+': <b>'+v+'</b>').join(" · ")+(rfq?' · 🔴 RFQ: <b>'+rfq+'</b>':'')+'</p><div style="max-height:260px;overflow:auto">'+a.slice(0,15).map(l=>'<div style="padding:6px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="closeM();gJump('+l.id+')"><b>'+esc(l.n)+'</b><br><span class="sub">'+esc(l.city||"")+' · '+esc(l.t||l.c)+'</span></div>').join("")+(a.length>15?'<p class="sub">…aur '+(a.length-15)+' leads, "Sab leads" tab mein dekho</p>':"")+'</div><p><button class="sm" onclick="closeM()">Theek hai</button></p>')
+}catch(e){}}
+window.addEventListener("load",()=>{const r0=window.render;if(typeof r0!=="function")return;window.render=function(){const x=r0.apply(this,arguments);setTimeout(newPopup,60);return x};setTimeout(newPopup,4000)});
 /* ===== Phase 2: realtime claim lock + call log ===== */
-function sbOwn(o){return !sbUid||(sbMe&&sbMe.role==="admin")||o.by===sbUid}
+function sbOwn(o){return !sbUid||(sbMe&&sbMe.role==="admin")||o.by===sbUid||(!o.by&&sbMe&&String(sbMe.email||"").toLowerCase()==="mohnish.p@genesisinfoserve.com")}
 var sbUid=null,sbMap={},sbLocks={},sbNames={},sbMe=null,sbLockT=null,sbRt=null,sbPaintT=null,sbCh=null,sbLive=false,sbLastPoll=0;
 const SB_JS="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js";
 const sbToast=m=>{try{typeof toast==="function"?toast(m):alert(m)}catch(e){}};
