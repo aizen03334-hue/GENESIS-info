@@ -3280,7 +3280,7 @@ const A={asa:()=>{const s=US.filter(u=>u.role==='sa');
  if(s.length&&!sa())return toast('Sirf Super Admin hi naya Super Admin add kar sakta hai');
  dlg(`<h3>🛡 Add Super Admin (${s.length}/3)</h3>Naam<input id=an maxlength=40>PIN 4-8 digit<input id=ap type=password inputmode=numeric maxlength=8>${s.length?`<div class=tmh>Confirm: aapka (${E(ME.name)}) PIN</div><input id=aop type=password inputmode=numeric maxlength=8>`:'<div class=tmm>Pehla Super Admin, approval nahi chahiye</div>'}<button class=tmp data-t=sasub>Add</button><button data-t=cd>Cancel</button>`)},
  sasub:async()=>{const n=$('#an').value.trim(),p=$('#ap').value.trim(),s=US.filter(u=>u.role==='sa');
- if(!n||!/^\\d{4,8}$/.test(p))return toast('Naam aur 4-8 digit PIN daalo');
+ if(!n||!/^\d{4,8}$/.test(p))return toast('Naam aur 4-8 digit PIN daalo');
  if(s.length>=3)return toast('Max 3 Super Admin');
  if(s.length){if(!sa())return toast('Sirf Super Admin');if(ME.pin!==await hs($('#aop').value))return toast('Aapka PIN galat')}
  await putU({id:'sa'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),name:n,role:'sa',desig:'Super Admin',pin:await hs(p),active:true,ver:1,dp:false,target:0});
@@ -3289,7 +3289,7 @@ const A={asa:()=>{const s=US.filter(u=>u.role==='sa');
  dlg(`<h3>👤 Add Employee</h3>Naam<input id=en maxlength=40>Designation<select id=ed>${Object.keys(PR).map(k=>`<option>${k}</option>`).join('')}</select>Daily target<input id=et type=number min=1 placeholder="khaali = default">Employee PIN 4-8 digit<input id=ep type=password inputmode=numeric maxlength=8><div class=tmh>Confirm: aapka (${E(ME.name)}) PIN</div><input id=p1 type=password inputmode=numeric maxlength=8><button class=tmp data-t=aesub>Add Employee</button><button data-t=cd>Cancel</button>`)},
  aesub:async()=>{if(!sa())return toast('Sirf Super Admin');
  const n=$('#en').value.trim(),p=$('#ep').value.trim();
- if(!n||!/^\\d{4,8}$/.test(p))return toast('Naam aur 4-8 digit PIN daalo');
+ if(!n||!/^\d{4,8}$/.test(p))return toast('Naam aur 4-8 digit PIN daalo');
  if(ME.pin!==await hs($('#p1').value))return toast('Aapka PIN galat');
  const d=$('#ed').value;
  await putU({id:'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:n,role:'emp',desig:d,pin:await hs(p),active:true,ver:1,dp:false,target:+$('#et').value||PR[d].t});
