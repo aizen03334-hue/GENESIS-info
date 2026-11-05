@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- saved from url=(0046)https://aizen03334-hue.github.io/GENESIS-info/ -->
-<html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self';script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;font-src 'self' data: https://fonts.gstatic.com;img-src 'self' data: blob:;connect-src 'self' https://quzwwibuahjozskhzkvi.supabase.co wss://quzwwibuahjozskhzkvi.supabase.co https://docs.google.com https://*.googleusercontent.com https://script.google.com;object-src 'none';base-uri 'none';form-action 'self'"><meta name="referrer" content="no-referrer"><meta http-equiv="X-Content-Type-Options" content="nosniff"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self';script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;font-src 'self' data: https://fonts.gstatic.com;img-src 'self' data: blob:;connect-src 'self' https://quzwwibuahjozskhzkvi.supabase.co wss://quzwwibuahjozskhzkvi.supabase.co https://docs.google.com https://*.googleusercontent.com https://script.google.com;object-src 'none';frame-src 'none';upgrade-insecure-requests;base-uri 'none';form-action 'self'"><meta name="referrer" content="no-referrer"><meta http-equiv="X-Content-Type-Options" content="nosniff"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
 
 
@@ -1417,7 +1417,7 @@ async function feedCheck(manual){const u=(S.feed||"").trim();if(!u){if(manual)al
   else{feedMsg=res.add+" naye, "+res.dup+" duplicate";if(res.add){toast("🆕 "+res.add+" naye leads aaye");render()}else if(manual)toast("Koi naya lead nahi")}}
  catch(e){feedMsg="Link nahi khula. Sheet 'Publish to web' (CSV) hai? Link check karo."}
  const el=document.getElementById("feedst");if(el)el.textContent=feedMsg}
-setInterval(()=>feedCheck(false),30*60*1000);setTimeout(()=>feedCheck(false),3000);
+setInterval(()=>feedCheck(false),20*60*1000);setTimeout(()=>feedCheck(false),3000);
 function backup(){dl("calling-desk-backup.json",JSON.stringify(S),"application/json")}
 function restore(inp){const f=inp.files[0];if(!f)return;f.text().then(t=>{try{const d=JSON.parse(t);if(!d.leads)throw 0;S=d;save();location.reload()}catch(e){alert("Ye backup file sahi nahi hai.")}});inp.value=""}
 </script>
@@ -3197,8 +3197,8 @@ body.tm-Telecaller #tabs button[onclick*="'prod'"],body.tm-Telecaller #tabs butt
 const $=s=>document.querySelector(s),E=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),td=()=>new Date().toDateString();
 const PR={'Telecaller':{ic:'📞',t:60,rec:1,w:2,hide:['prod','rp','rep']},'Sales Executive':{ic:'💼',t:35,rec:1,w:1.5,hide:['rep']},'Sr Sales Executive':{ic:'🏆',t:25,rec:1,w:1,hide:[]},'Team Lead':{ic:'🧭',t:15,w:.5,team:1,hide:[]},'Presales / Tech':{ic:'🛠',t:12,rec:1,w:1,cats:['Design software','Security'],hide:['rp']}};
 let US=[],OW={},FD=[],BC=null,ME=null,ALL=null,since=0,lastF=0,pc=0,PU={},PV={},fl=0,ft,tb='ov',bad={},open=0;
-try{PU=JSON.parse(localStorage.tm_pu||'{}');US=JSON.parse(localStorage.tm_us||'[]');OW=JSON.parse(localStorage.tm_ow||'{}')}catch(e){}
-const sv=()=>{try{localStorage.tm_us=JSON.stringify(US);localStorage.tm_ow=JSON.stringify(OW);localStorage.tm_pu=JSON.stringify(PU)}catch(e){}};
+try{PU=JSON.parse(localStorage.tm_pu||'{}');US=JSON.parse(sessionStorage.tm_us||'[]');OW=JSON.parse(localStorage.tm_ow||'{}')}catch(e){}
+const sv=()=>{try{sessionStorage.tm_us=JSON.stringify(US);localStorage.tm_ow=JSON.stringify(OW);localStorage.tm_pu=JSON.stringify(PU)}catch(e){}};
 const rq=async(p,o)=>{const r=await sbFetch('/rest/v1/'+p,o);if(!r.ok)throw new Error(r.status);return o&&o.method&&o.method!=='GET'?null:r.json()};
 const up=(t,pk,rows)=>rq(t+'?on_conflict='+pk,{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows)});
 const hs=async s=>{try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('gx|'+s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=5381;for(const c of 'gx|'+s)h=(h*33)^c.charCodeAt(0);return 'f'+(h>>>0)}};
@@ -3462,4 +3462,4 @@ nav button.on{background:linear-gradient(135deg,#6d5dfc,#8b7dff)!important}
  setInterval(function(){var n=document.querySelector("nav button.on");if(n){var t=[].filter.call(n.childNodes,function(x){return x.nodeType===3}).map(function(x){return x.textContent}).join("").trim()||n.textContent.trim();var p=document.getElementById("nvPg");if(p&&p.textContent!==t)p.textContent=t}
   var u=document.querySelector("#tmB b");if(u){var a=document.getElementById("nvAv"),c=(u.textContent||"G").trim().charAt(0).toUpperCase();if(a&&a.textContent!==c)a.textContent=c}},400);
 })();
-</script><script>if(top!==self){document.documentElement.style.display="none";top.location=self.location}(function(){var t,r=function(){clearTimeout(t);t=setTimeout(function(){try{sessionStorage.removeItem("sb_auth")}catch(e){}location.reload()},30*60*1000)};["click","keydown","touchstart"].forEach(function(v){addEventListener(v,r)});r()})();</script></body></html>
+</script><script>if(top!==self){document.documentElement.style.display="none";top.location=self.location}(function(){var t,r=function(){clearTimeout(t);t=setTimeout(function(){try{sessionStorage.removeItem("sb_auth");sessionStorage.removeItem("tm_me");sessionStorage.removeItem("tm_us")}catch(e){}location.reload()},20*60*1000)};["click","keydown","touchstart"].forEach(function(v){addEventListener(v,r)});r()})();</script></body></html>
